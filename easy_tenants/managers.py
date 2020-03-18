@@ -11,6 +11,15 @@ def _tenant_manager_constructor(manager_class=models.Manager):
                 tenant=SimpleLazyObject(get_current_tenant)
             )
 
+        def bulk_create(self, objs):
+            tenant = get_current_tenant()
+
+            for obj in objs:
+                if hasattr(obj, 'tenant_id'):
+                    obj.tenant = tenant
+
+            return super().bulk_create(objs)
+
         def contribute_to_class(self, model, name):
             super().contribute_to_class(model, name)
 

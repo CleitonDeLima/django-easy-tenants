@@ -1,6 +1,6 @@
 import pytest
 
-from easy_tenants import tenant_context
+from easy_tenants import tenant_context, get_current_tenant
 from easy_tenants.models import TenantAbstract
 from tests.models import StoreTenant, Product, Contact
 
@@ -39,3 +39,16 @@ def test_custom_queryset_in_manager(context):
 
     assert callable(Contact.objects.by_phone)
     assert Contact.objects.by_phone().count() == 1
+
+
+def test_bulk_create(context):
+    objs = [
+        Product(name='prod1'),
+        Product(name='prod2'),
+    ]
+    Product.objects.bulk_create(objs)
+    tenant = get_current_tenant()
+
+    assert Product.objects.count() == 2
+    assert objs[0].tenant == tenant
+    assert objs[1].tenant == tenant
