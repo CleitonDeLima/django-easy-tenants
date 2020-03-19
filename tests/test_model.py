@@ -1,5 +1,3 @@
-import pytest
-
 from easy_tenants import tenant_context, get_current_tenant
 from easy_tenants.models import TenantAbstract
 from tests.models import StoreTenant, Product, Contact
@@ -20,8 +18,7 @@ def test_autoset_current_tenant_in_instance_model(context):
     assert prod.tenant_id
 
 
-@pytest.mark.django_db
-def test_get_objects_of_tenant():
+def test_get_objects_of_tenant(db):
     store1 = StoreTenant.objects.create()
     store2 = StoreTenant.objects.create()
     with tenant_context(store1):
