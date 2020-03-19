@@ -248,6 +248,20 @@ testing = ["freezegun (>=0.3.11,<1)", "pathlib2 (>=2.3.3,<3)", "pytest (>=4.0.0,
 
 [[package]]
 category = "dev"
+description = "Seamless integration of tox into GitHub Actions"
+name = "tox-gh-actions"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+version = "1.1.0"
+
+[package.dependencies]
+tox = ">=3.12.2"
+
+[package.extras]
+testing = ["flake8 (>=3,<4)", "pytest (>=4.0.0,<6)", "pytest-mock (>=2,<3)", "pytest-randomly (>=3)"]
+
+[[package]]
+category = "dev"
 description = "Virtual Python Environment builder"
 name = "virtualenv"
 optional = false
@@ -273,7 +287,7 @@ python-versions = "*"
 version = "0.1.8"
 
 [metadata]
-content-hash = "5b71e58c708df5dfad8c090776c581b774bc8884d4728546a90b6d6708915ca3"
+content-hash = "430ece7249595742db785abd418e106319eb9bed48f9cd650bee3846b149d3fd"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -393,6 +407,10 @@ toml = [
 tox = [
     {file = "tox-3.14.5-py2.py3-none-any.whl", hash = "sha256:0cbe98369081fa16bd6f1163d3d0b2a62afa29d402ccfad2bd09fb2668be0956"},
     {file = "tox-3.14.5.tar.gz", hash = "sha256:676f1e3e7de245ad870f956436b84ea226210587d1f72c8dfb8cd5ac7b6f0e70"},
+]
+tox-gh-actions = [
+    {file = "tox-gh-actions-1.1.0.tar.gz", hash = "sha256:fbce2a435cab4619e5fe77ce08b941bf8f1569f67cc43ac26b0249b2c7b029f4"},
+    {file = "tox_gh_actions-1.1.0-py2.py3-none-any.whl", hash = "sha256:1c491a6e73b13c72829b95e50d63060f920bd02e5e2ba3c5a79bfc312598f966"},
 ]
 virtualenv = [
     {file = "virtualenv-20.0.10-py2.py3-none-any.whl", hash = "sha256:10750cac3b5a9e6eed54d0f1f8222c550dc47f84609c95cbc504d44a58a048b8"},
