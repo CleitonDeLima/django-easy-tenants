@@ -16,8 +16,22 @@ class StoreTenant(models.Model):
 
 class Product(TenantAbstract):
     name = models.CharField(max_length=10)
+    category = models.ForeignKey('tests.Category', null=True,
+                                 on_delete=models.SET_NULL)
 
     objects = TenantManager()
+
+    def __str__(self):
+        return self.name
+
+
+class Category(TenantAbstract):
+    name = models.CharField(max_length=10)
+
+    objects = TenantManager()
+
+    def __str__(self):
+        return self.name
 
 
 class Contact(TenantAbstract):

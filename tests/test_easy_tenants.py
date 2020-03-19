@@ -1,13 +1,11 @@
-import pytest
-
 from easy_tenants import __version__
-from tests.models import StoreTenant
 from easy_tenants import (
     get_tenant_model,
     set_current_tenant,
     get_current_tenant,
     tenant_context
 )
+from tests.models import StoreTenant
 
 
 def test_version():
@@ -18,16 +16,14 @@ def test_get_tenant_model():
     assert StoreTenant == get_tenant_model()
 
 
-@pytest.mark.django_db
-def test_get_and_set_current_tenant_thread_local():
+def test_get_and_set_current_tenant_thread_local(db):
     tenant = StoreTenant.objects.create()
     set_current_tenant(tenant)
 
     assert tenant == get_current_tenant()
 
 
-@pytest.mark.django_db
-def test_tenant_context():
+def test_tenant_context(db):
     tenant1 = StoreTenant.objects.create()
     tenant2 = StoreTenant.objects.create()
     set_current_tenant(tenant1)
