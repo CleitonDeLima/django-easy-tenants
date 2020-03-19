@@ -9,7 +9,7 @@ thread_local = threading.local()
 
 
 def get_tenant_model():
-    return apps.get_model(*settings.TENANT_MODEL.split('.'))
+    return apps.get_model(*settings.EASY_TENANTS_TENANT_MODEL.split('.'))
 
 
 def get_current_tenant():

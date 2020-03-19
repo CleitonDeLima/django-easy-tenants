@@ -14,6 +14,12 @@ def pytest_configure():
                 'NAME': ':memory:',
             }
         },
+        MIDDLEWARE=[
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+        ],
         INSTALLED_APPS=[
             'django.contrib.admin',
             'django.contrib.auth',
@@ -23,8 +29,19 @@ def pytest_configure():
             'django.contrib.staticfiles',
             'tests',
         ],
-        TENANT_MODEL='tests.StoreTenant'
+        EASY_TENANTS_TENANT_MODEL='tests.StoreTenant',
     )
+
+
+@pytest.fixture
+def djasserts():
+    from django.test import TestCase
+    testcase = TestCase()
+
+    class Asserts:
+        redirects = testcase.assertRedirects
+
+    return Asserts()
 
 
 @pytest.fixture

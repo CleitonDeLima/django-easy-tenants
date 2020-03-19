@@ -1,0 +1,11 @@
+[run]
+source=
+    easy_tenants/
+omit=
+    easy_tenants/*/urls.py
+    easy_tenants/apps.py
+
+[report]
+omit=
+    easy_tenants/*/apps.py
+    easy_tenants/*/urls.py
