@@ -26,11 +26,11 @@ python = ">=3.6"
 django = "^3.0.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-pytest-django = "^3.8.0"
-tox = "^3.14.5"
-pytest-cov = "^2.8.1"
-tox-gh-actions = "^1.1.0"
+pytest = "*"
+pytest-django = "*"
+tox = "*"
+pytest-cov = "*"
+tox-gh-actions = "*"
 
 [build-system]
 requires = ["poetry>=0.12"]
