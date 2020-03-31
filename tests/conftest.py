@@ -1,11 +1,11 @@
 import pytest
-from django.conf import settings
+from django.conf import settings as dj_settings
 
 from easy_tenants import tenant_context, get_tenant_model
 
 
 def pytest_configure():
-    settings.configure(
+    dj_settings.configure(
         SECRET_KEY='any-key',
         ROOT_URLCONF='tests.urls',
         DATABASES={
@@ -29,7 +29,7 @@ def pytest_configure():
             'django.contrib.staticfiles',
             'tests',
         ],
-        EASY_TENANTS_TENANT_MODEL='tests.StoreTenant',
+        EASY_TENANTS_MODEL='tests.StoreTenant',
     )
 
 

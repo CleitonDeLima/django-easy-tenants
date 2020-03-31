@@ -1,4 +1,3 @@
-from easy_tenants import __version__
 from easy_tenants import (
     get_tenant_model,
     set_current_tenant,
@@ -6,10 +5,6 @@ from easy_tenants import (
     tenant_context
 )
 from tests.models import StoreTenant
-
-
-def test_version():
-    assert __version__ == '0.1.0'
 
 
 def test_get_tenant_model():

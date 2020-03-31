@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Manager
 
 from easy_tenants.managers import TenantManager
-from easy_tenants.models import TenantAbstract
+from easy_tenants.models import TenantMixin, TenantAbstract
 
 
 class ContactQuery(models.QuerySet):
@@ -10,7 +10,7 @@ class ContactQuery(models.QuerySet):
         return self.filter(name__startswith='phone')
 
 
-class StoreTenant(models.Model):
+class StoreTenant(TenantMixin):
     pass
 
 

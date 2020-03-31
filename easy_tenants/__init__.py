@@ -4,12 +4,11 @@ from contextlib import contextmanager
 from django.apps import apps
 from django.conf import settings
 
-__version__ = '0.1.0'
 thread_local = threading.local()
 
 
 def get_tenant_model():
-    return apps.get_model(*settings.EASY_TENANTS_TENANT_MODEL.split('.'))
+    return apps.get_model(*settings.EASY_TENANTS_MODEL.split('.'))
 
 
 def get_current_tenant():

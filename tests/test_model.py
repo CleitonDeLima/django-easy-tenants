@@ -1,3 +1,5 @@
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor
+
 from easy_tenants import tenant_context, get_current_tenant
 from easy_tenants.models import TenantAbstract
 from tests.models import StoreTenant, Product, Contact
@@ -6,6 +8,11 @@ from tests.models import StoreTenant, Product, Contact
 def test_inheritance_tenant_model():
     assert TenantAbstract in Product.__mro__
     assert getattr(Product.objects, 'tenant_manager', False)
+
+
+def test_tenant_mixin():
+    assert hasattr(StoreTenant, 'users')
+    assert isinstance(StoreTenant.users, ManyToManyDescriptor)
 
 
 def test_create_object(context):
@@ -49,3 +56,15 @@ def test_bulk_create(context):
     assert Product.objects.count() == 2
     assert objs[0].tenant == tenant
     assert objs[1].tenant == tenant
+
+
+def test_all_objects(db):
+    store1 = StoreTenant.objects.create()
+    store2 = StoreTenant.objects.create()
+    with tenant_context(store1):
+        Product.objects.create(name='prod1')
+
+    with tenant_context(store2):
+        Product.objects.create(name='prod2')
+
+    assert Product.all_objects.count() == 2

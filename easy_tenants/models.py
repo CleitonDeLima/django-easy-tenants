@@ -2,11 +2,22 @@ from django.conf import settings
 from django.db import models
 
 
+class TenantMixin(models.Model):
+    users = models.ManyToManyField(
+        to=settings.AUTH_USER_MODEL
+    )
+
+    class Meta:
+        abstract = True
+
+
 class TenantAbstract(models.Model):
     tenant = models.ForeignKey(
-        to=settings.EASY_TENANTS_TENANT_MODEL,
+        to=settings.EASY_TENANTS_MODEL,
         on_delete=models.CASCADE
     )
+
+    all_objects = models.Manager()
 
     class Meta:
         abstract = True
