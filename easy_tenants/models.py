@@ -1,5 +1,6 @@
-from django.conf import settings
 from django.db import models
+
+from easy_tenants.conf import settings
 
 
 class TenantMixin(models.Model):

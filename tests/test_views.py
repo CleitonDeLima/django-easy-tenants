@@ -1,20 +1,12 @@
-import pytest
 from django.shortcuts import resolve_url
 
 from easy_tenants import get_current_tenant
 from tests.models import StoreTenant
 
 
-@pytest.fixture
-def logged_client(django_user_model, client):
-    user = django_user_model.objects.create_user('user test')
-    client.force_login(user)
-    return client
-
-
 def test_set_current_tenant(logged_client):
     store = StoreTenant.objects.create()
-    url = resolve_url('easy_tenant:set-current-tenant', pk=store.id)
+    url = resolve_url('easy_tenants:set-current-tenant', pk=store.id)
     response = logged_client.post(url)
 
     assert store == get_current_tenant()
@@ -23,7 +15,7 @@ def test_set_current_tenant(logged_client):
 
 def test_set_current_tenant_required_login(db, client, settings, djasserts):
     store = StoreTenant.objects.create()
-    url = resolve_url('easy_tenant:set-current-tenant', pk=store.id)
+    url = resolve_url('easy_tenants:set-current-tenant', pk=store.id)
     response = client.post(url)
     expected_url = '%s?next=%s' % (resolve_url(settings.LOGIN_URL), url)
 
@@ -31,9 +23,10 @@ def test_set_current_tenant_required_login(db, client, settings, djasserts):
 
 
 def test_set_current_tenant_redirect_url(logged_client, settings, djasserts):
-    settings.EASY_TENANTS_REDIRECT_URL = 'home'
+    settings.EASY_TENANTS_REDIRECT_URL = 'store-list'
     store = StoreTenant.objects.create()
-    url = resolve_url('easy_tenant:set-current-tenant', pk=store.id)
+    url = resolve_url('easy_tenants:set-current-tenant', pk=store.id)
     response = logged_client.post(url)
 
-    djasserts.redirects(response, resolve_url('home'))
+    djasserts.redirects(response, resolve_url('store-list'))
+    assert settings.EASY_TENANTS_SESSION_KEY in logged_client.session

@@ -2,7 +2,8 @@ import threading
 from contextlib import contextmanager
 
 from django.apps import apps
-from django.conf import settings
+
+from easy_tenants.conf import settings
 
 thread_local = threading.local()
 
