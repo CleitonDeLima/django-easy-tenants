@@ -1,28 +1,10 @@
-import threading
-from contextlib import contextmanager
+from easy_tenants.utils import (
+    get_tenant_model, get_current_tenant, set_current_tenant, tenant_context
+)
 
-from django.apps import apps
+__all__ = [
+    'get_tenant_model', 'get_current_tenant', 'set_current_tenant',
+    'tenant_context',
+]
 
-from easy_tenants.conf import settings
-
-thread_local = threading.local()
-
-
-def get_tenant_model():
-    return apps.get_model(*settings.EASY_TENANTS_MODEL.split('.'))
-
-
-def get_current_tenant():
-    return getattr(thread_local, 'tenant', None)
-
-
-def set_current_tenant(tenant):
-    setattr(thread_local, 'tenant', tenant)
-
-
-@contextmanager
-def tenant_context(tenant):
-    previous_tenant = get_current_tenant()
-    set_current_tenant(tenant)
-    yield
-    set_current_tenant(previous_tenant)
+default_app_config = 'easy_tenants.apps.EasyTenantsConfig'
