@@ -2,7 +2,9 @@
 source = easy_tenants/
 omit=
     easy_tenants/apps.py
+    easy_tenants/checks.py
 
 [report]
 omit =
     easy_tenants/apps.py
+    easy_tenants/checks.py
