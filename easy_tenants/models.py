@@ -5,7 +5,8 @@ from easy_tenants.conf import settings
 
 class TenantMixin(models.Model):
     users = models.ManyToManyField(
-        to=settings.AUTH_USER_MODEL
+        to=settings.AUTH_USER_MODEL,
+        related_name='tenants'
     )
 
     class Meta:

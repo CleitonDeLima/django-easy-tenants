@@ -128,6 +128,3 @@ LOGIN_URL = 'admin:login'
 EASY_TENANTS_MODEL = 'app_test.Customer'
 EASY_TENANTS_REDIRECT_URL = 'home'
 EASY_TENANTS_LIST_URL = 'customer-list'
-EASY_TENANTS_IGNORE_URLS = [
-    'admin:login'
-]

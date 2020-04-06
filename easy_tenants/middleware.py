@@ -47,6 +47,7 @@ class DefaultTenantMiddleware:
         """
         ignore_urls = settings.EASY_TENANTS_IGNORE_URLS[:]
         ignore_urls.append(settings.EASY_TENANTS_LIST_URL)
+        ignore_urls.append(settings.LOGIN_URL)
         ignore_urls.append('easy_tenants:set-current-tenant')
 
         view_name = resolve(request.path).view_name
