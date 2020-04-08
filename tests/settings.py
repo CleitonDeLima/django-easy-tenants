@@ -1,3 +1,5 @@
+import tempfile
+
 SECRET_KEY = 'any-key'
 ROOT_URLCONF = 'tests.urls'
 DATABASES = {
@@ -23,3 +25,6 @@ INSTALLED_APPS = [
     'tests',
 ]
 EASY_TENANTS_MODEL = 'tests.StoreTenant'
+
+MEDIA_ROOT = tempfile.gettempdir()
+MEDIA_URL = '/media/'

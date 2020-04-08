@@ -21,10 +21,10 @@ def logged_client(django_user_model, client):
 
 
 @pytest.fixture
-def context(db):
+def tenant_ctx(db):
     """Create a tenant a set context"""
     from easy_tenants import tenant_context, get_tenant_model
 
     tenant = get_tenant_model().objects.create()
     with tenant_context(tenant):
-        yield
+        yield tenant

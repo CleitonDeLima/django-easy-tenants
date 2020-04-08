@@ -5,7 +5,7 @@ from tests.models import Product, Category, StoreTenant
 from easy_tenants import tenant_context
 
 
-def test_modelfield_contents(context):
+def test_modelfield_contents(tenant_ctx):
     class ProductForm(forms.Form):
         product = forms.ModelChoiceField(
             queryset=Product.objects.all()
@@ -26,7 +26,7 @@ def test_modelfield_contents(context):
     assert 'prod3' not in form_template
 
 
-def test_related_field_contents(context):
+def test_related_field_contents(tenant_ctx):
     class ProductForm(forms.Form):
         category = forms.ModelChoiceField(
             queryset=Category.objects.all()
