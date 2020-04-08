@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.core.files.storage import FileSystemStorage
 from django.utils._os import safe_join
 
@@ -8,6 +10,7 @@ class TenantFileSystemStorage(FileSystemStorage):
     """
     Standard filesystem tenant storage
     """
+
     def path(self, name):
         """
         Return a local filesystem path joined with a tenant context
@@ -28,8 +31,9 @@ class TenantFileSystemStorage(FileSystemStorage):
         Return an absolute URL joined with a tenant context where the file's
         contents can be accessed directly by a Web browser.
         """
-        tenant = get_current_tenant()
-        # TODO: Change tenant attr with function
-        name = '{0}/{1}'.format(str(tenant.id), name)
+        with suppress(AttributeError):
+            tenant = get_current_tenant()
+            # TODO: Change tenant attr with function
+            name = '{0}/{1}'.format(str(tenant.id), name)
 
         return super().url(name)
