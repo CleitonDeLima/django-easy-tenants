@@ -15,12 +15,12 @@ def test_tenant_mixin():
     assert isinstance(StoreTenant.users, ManyToManyDescriptor)
 
 
-def test_create_object(context):
+def test_create_object(tenant_ctx):
     Product.objects.create(name='prod1')
     assert Product.objects.count()
 
 
-def test_autoset_current_tenant_in_instance_model(context):
+def test_autoset_current_tenant_in_instance_model(tenant_ctx):
     prod = Product.objects.create(name='prod1')
     assert prod.tenant_id
 
@@ -37,7 +37,7 @@ def test_get_objects_of_tenant(db):
         assert Product.objects.count() == 1
 
 
-def test_custom_queryset_in_manager(context):
+def test_custom_queryset_in_manager(tenant_ctx):
     Contact.objects.create(name='phone 222')
     Contact.objects.create(name='email')
 
@@ -45,7 +45,7 @@ def test_custom_queryset_in_manager(context):
     assert Contact.objects.by_phone().count() == 1
 
 
-def test_bulk_create(context):
+def test_bulk_create(tenant_ctx):
     objs = [
         Product(name='prod1'),
         Product(name='prod2'),

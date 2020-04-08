@@ -163,6 +163,13 @@ EASY_TENANTS_IGNORE_URLS = [
 ]
 ```
 
+Caso queira separar os arquivos de upload por tenant, basta mudar a configuração `DEFAULT_FILE_STORAGE`
+(disponivel somente para arquivos locais):
+
+```python
+DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
+```
+
 
 ## Excutar o projeto de exemplo
 ```bash
