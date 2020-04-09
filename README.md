@@ -5,43 +5,60 @@
 [![PyPI Version](https://img.shields.io/pypi/v/django-easy-tenants.svg)](https://pypi.org/project/django-easy-tenants/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/django-easy-tenants.svg)](https://img.shields.io/pypi/dm/django-easy-tenants.svg)
 
-Este projeto tem como objetivo dar suporte a multiplos inquilinos para uma 
-aplicação django. 
+
+This is a Django app for managing multiple tenants on the same project 
+instance using a shared approach.
  
-Normalmente, existem três soluções para resolver o problema de multiplos inquilinos:
+ 
+## Background
 
-1. Isolada: bancos de dados separados. Cada inquilino possui seu próprio banco de dados.
-2. Semi-Isolada: Banco de Dados Compartilhado, Esquemas Separados. Um banco de dados para todos os inquilinos, 
-mas um esquema para cada inquilino.
-3. Compartilhada: banco de dados compartilhado, esquema compartilhado. 
-Todos os inquilinos compartilham o mesmo banco de dados e esquema. Há uma tabela de inquilino principal, na qual 
-todas as outras tabelas têm uma chave estrangeira apontando para cada inquilino.
+There are typically three solutions for solving the multitenancy problem:
 
-Esta aplicação implementa a terceira solução, que em nossa opinião, é a melhor abordagem para suportar um número
-grande de inquilinos.
+1. Isolated Approach: Separate Databases. Each tenant has it’s own database.
+2. Semi Isolated Approach: Shared Database, Separate Schemas. 
+One database for all tenants, but one schema per tenant.
+3. Shared Approach: Shared Database, Shared Schema. All tenants share 
+the same database and schema. There is a main tenant-table, where all 
+other tables have a foreign key pointing to.
 
-Para mais informações: [Building Multi Tenant Applications with Django
+This application implements the third approach,  which in our opinion, 
+is the best solution for a large amount of tenants.
+
+For more information: [Building Multi Tenant Applications with Django
 ](https://books.agiliq.com/projects/django-multi-tenant/en/latest/)
 
-Segue um exemplo de cada solução considerando 5000 inquilinos: 
+Below is a demonstration of the features in each approach for an application 
+with 5000 tenants.
 
-Solução       | Quantidade DB | Quantidade Esquemas | Tempo de migração      | Acesso publico
-------------- | ------------- | ------------------- | ---------------------- | ---------------
-Isolada       | 5000          | 1 por DB            | demorado (1 x DB)      | Não
-Semi-Isolada  | 1             | 5000                | demorado (1 x esquema) | Sim
-Compartilhada | 1             | 1                   | rápido (1x)            | Sim
+Approach       | Number of DB | Number of Schemas | Django migration time | Public access
+-------------- | ------------ | ----------------- | --------------------- | ---------------
+Isolated       | 5000         | 5000              | slow (1/DB)           | No
+Semi Isolated  | 1            | 5000              | slow (1/Schema)       | Yes
+Shared         | 1            | 1                 | fast (1)              | Yes
 
 
-## Como funciona
+## How it works
+The following image shows the flow of how this application works.
+
 ![how to works](./screenshots/flux_easy_tenants.png) 
 
 
-## Instalação
-É aconcelhavel fazer a instalação no inicio de um projeto. Em um projeto já existente,
-depedendo da estrutura dos modelos, pode ser dificil a migração dos dados.
+## Instalation
+Assuming you have django installed, the first step is to install `django-easy-tenants`.
+```bash
+pip install django-easy-tenants
+```
+Now you can import the tenancy module in your Django project.
 
-Adicione `easy_tenant` em seu `INSTALLED_APPS` no settings.py:
 
+## Setup
+It is recommended to install this app at the beginning of a project. 
+In an existing project, depending on the structure of the models, 
+the data migration can be hard.
+
+Add `easy_tenant` to your `INSTALLED_APPS` on `settings.py`.
+
+`settings.py`
 ```python
 INSTALLED_APPS = [
     ...,
@@ -49,8 +66,7 @@ INSTALLED_APPS = [
 ]
 ```
    
-É preciso criar um modelo que será o inquilino da aplicação, em seus settings adicione 
-`EASY_TENANTS_MODEL`:
+Create a model which will be the tenant of the application.
 
 `yourapp/models.py`
 ```python
@@ -60,12 +76,17 @@ class Customer(TenantMixin):
     ...
 ```
 
+Define on your `settings.py` which model is your tenant model. Assuming you created `Customer` 
+inside an app named `yourapp`, your EASY_TENANTS_MODEL should look like this:
+
 `settings.py`
 ```python
-EASY_TENANTS_MODEL = 'yourapp.CustomModel'
+EASY_TENANTS_MODEL = 'yourapp.Customer'
 ```
 
-Seus modelos que serão isolado por inquilino devem herdar de `TenantAbstract` e usar o manager `TenantManager`:
+Your models, that should have data isolated by tenant, need to inherit from `TenantAbstract`
+and the objects need to be replaced by `TenantManager()`.
+
 
 ```python
 from django.db import models
@@ -78,8 +99,8 @@ class Product(TenantAbstract):
     objects = TenantManager()
 ```
 
-É preciso definir o middleware `easy_tenants.middleware.DefaultTenantMiddleware` no settings:  
-_deve vir depois do `django.contrib.auth.middleware.AuthenticationMiddleware`_
+Add the middleware `easy_tenants.middleware.DefaultTenantMiddleware` to your middleware classes.  
+_Need to be included after `django.contrib.auth.middleware.AuthenticationMiddleware`._
 
 ```python
 MIDDLEWARE = [
@@ -95,15 +116,15 @@ MIDDLEWARE = [
 ]
 ```
 
-Inclua a url:
+Include the `django-easy-tenants` urls.
 
 ```python
 path('easy-tenants/', include('easy_tenants.urls')),
 ```
 
-É preciso criar uma view que irá listar todos os seus tenants e depois incluir o nome
-dessa view no settings. Isso server para definir um tenant na sessão do usuário.
-
+You need to create a view that will list all your tenants and then 
+include the name of that view in the settings. This is how the user 
+chooses a tenant that will be saved in the user's session.
 
 `views.py`
 ```python
@@ -142,18 +163,17 @@ path('tenants/', tenant_list, name='tenant-list'),
 EASY_TENANTS_LIST_URL = 'tenant-list'
 ```
 
-Depois de escolher o tenant, o usuário é redirecionado para uma url definida 
-no settings `EASY_TENANTS_REDIRECT_URL`:
+After choosing the tenant, the user is redirected to a URL defined in the 
+settings `EASY_TENANTS_REDIRECT_URL`.
 
 `settings.py`
 ```python
 EASY_TENANTS_REDIRECT_URL = 'home'
 ```  
 
-
-Caso não houver um tenant definido na sessão, toda url é é redirecionada para 
-`EASY_TENANTS_LIST_URL`, se deseja ignorar algumas urls é possivel informar o nome
-delas na configuração `EASY_TENANTS_IGNORE_URLS`, conforme o exemplo:
+If a URL is accessed and there is no tenant defined in the session, the user is redirected to 
+`EASY_TENANTS_LIST_URL`. If you want to ignore some URLs you can add their name in the 
+list `EASY_TENANTS_IGNORE_URLS`, like below.
 
 ```python
 EASY_TENANTS_IGNORE_URLS = [
@@ -163,23 +183,23 @@ EASY_TENANTS_IGNORE_URLS = [
 ]
 ```
 
-Caso queira separar os arquivos de upload por tenant, basta mudar a configuração `DEFAULT_FILE_STORAGE`
-(disponivel somente para arquivos locais):
+If you want to separate the upload files by tenant, you need to change the `DEFAULT_FILE_STORAGE` 
+configuration (only available for local files).
 
 ```python
 DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
 ```
 
 
-## Excutar o projeto de exemplo
+## Running the example project
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
-Acesse a pagina `/admin/`, crie um `Customer` e adicione o usuário a ele.
+Access the page `/admin/`, create a `Customer` and then add a user on the created `Customer`.
 
-## Inspiração
+## Motivation
 [django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)  
 [django-tenants](https://github.com/tomturner/django-tenants)  
 [django-scopes](https://github.com/raphaelm/django-scopes)  
