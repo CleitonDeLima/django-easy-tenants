@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-easy-tenants"
-version = "0.2.1"
+version = "0.2.3"
 description = "Easy to create applications that use tenants in django"
 authors = ["Cleiton Lima <cleiton.limapin@gmail.com>"]
 license = "MIT"
@@ -23,8 +23,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6"
-django = "^3.0.4"
 django-appconf = "^1.0.4"
+django = ">=2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"

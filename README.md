@@ -56,7 +56,7 @@ It is recommended to install this app at the beginning of a project.
 In an existing project, depending on the structure of the models, 
 the data migration can be hard.
 
-Add `easy_tenant` to your `INSTALLED_APPS` on `settings.py`.
+Add `easy_tenants` to your `INSTALLED_APPS` on `settings.py`.
 
 `settings.py`
 ```python
