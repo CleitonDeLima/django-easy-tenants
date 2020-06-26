@@ -1,7 +1,7 @@
 from django.shortcuts import resolve_url
 
 from easy_tenants import get_current_tenant
-from tests.models import StoreTenant
+from tests.models import StoreTenant, Contact
 
 
 def test_set_current_tenant(logged_client):
@@ -30,3 +30,11 @@ def test_set_current_tenant_redirect_url(logged_client, settings, djasserts):
 
     djasserts.redirects(response, resolve_url('store-list'))
     assert settings.EASY_TENANTS_SESSION_KEY in logged_client.session
+
+
+class TestViewsTenantContext:
+    def test_declare_queryset_attr(self, tenant_ctx, client):
+        Contact.objects.create(name='phone1')
+        Contact.objects.create(name='email')
+        response = client.get(resolve_url('contact-list'))
+        assert len(response.context['object_list']) == 1

@@ -24,6 +24,15 @@ INSTALLED_APPS = [
     'easy_tenants',
     'tests',
 ]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+    },
+]
+
 EASY_TENANTS_MODEL = 'tests.StoreTenant'
 
 MEDIA_ROOT = tempfile.gettempdir()
