@@ -199,6 +199,7 @@ DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
+python manage.py shell # create 2 customers
 python manage.py runserver
 ```
 Access the page `/admin/`, create a `Customer` and then add a user on the created `Customer`.

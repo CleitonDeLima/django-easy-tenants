@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'easy_tenants',
+    'debug_toolbar',
 
     'example.app_test',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -123,8 +125,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = 'admin:login'
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 
 EASY_TENANTS_MODEL = 'app_test.Customer'
-EASY_TENANTS_REDIRECT_URL = 'home'
-EASY_TENANTS_LIST_URL = 'customer-list'
+EASY_TENANTS_REDIRECT_URL = 'customer-list'
+EASY_TENANTS_SUCCESS_URL = 'home'
