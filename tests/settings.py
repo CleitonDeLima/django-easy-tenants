@@ -13,6 +13,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'easy_tenants.middleware.DefaultTenantMiddleware',
 ]
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -34,6 +35,10 @@ TEMPLATES = [
 ]
 
 EASY_TENANTS_MODEL = 'tests.StoreTenant'
+EASY_TENANTS_REDIRECT_URL = 'store-list'
+EASY_TENANTS_SUCCESS_URL = 'home'
 
 MEDIA_ROOT = tempfile.gettempdir()
 MEDIA_URL = '/media/'
+
+STATIC_URL = '/static/'

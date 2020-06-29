@@ -160,27 +160,31 @@ path('tenants/', tenant_list, name='tenant-list'),
 
 `settings.py`
 ```python
-EASY_TENANTS_LIST_URL = 'tenant-list'
+EASY_TENANTS_REDIRECT_URL = 'tenant-list'
 ```
 
 After choosing the tenant, the user is redirected to a URL defined in the 
-settings `EASY_TENANTS_REDIRECT_URL`.
+settings `EASY_TENANTS_SUCCESS_URL`.
 
 `settings.py`
 ```python
-EASY_TENANTS_REDIRECT_URL = 'home'
+EASY_TENANTS_SUCCESS_URL = 'home'
 ```  
 
 If a URL is accessed and there is no tenant defined in the session, the user is redirected to 
-`EASY_TENANTS_LIST_URL`. If you want to ignore some URLs you can add their name in the 
-list `EASY_TENANTS_IGNORE_URLS`, like below.
+`EASY_TENANTS_REDIRECT_URL`. If you want to ignore some views you can add a mixin or decorator to your view, 
+like below.  
+(views of `django.contrib.auth` that do not require authentication are ignored)
 
 ```python
-EASY_TENANTS_IGNORE_URLS = [
-    'admin:index',
-    'admin:login',
-    'namespace:url_name',
-]
+from easy_tenants import TenantNotRequiredMixin, tenant_not_required
+
+class MyView(TenantNotRequiredMixin, View):
+    ...
+
+@tenant_not_required
+def my_view(request):
+    ...
 ```
 
 If you want to separate the upload files by tenant, you need to change the `DEFAULT_FILE_STORAGE` 

@@ -9,8 +9,8 @@ __all__ = ('settings', 'EasyTenantsAppConf')
 class EasyTenantsAppConf(AppConf):
     MODEL = None
     IGNORE_URLS = []
-    LIST_URL = None
     REDIRECT_URL = None
+    SUCCESS_URL = None
     SESSION_KEY = 'tenant_id'
 
     class Meta:

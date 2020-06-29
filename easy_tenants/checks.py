@@ -28,15 +28,4 @@ def check_settings(app_configs, **kwargs):
             )
         )
 
-    if settings.EASY_TENANTS_LIST_URL is None:
-        errors.append(
-            checks.Error(
-                'EASY_TENANTS_LIST_URL must be in settings in order to '
-                'use the easy_tenants application.',
-                hint='EASY_TENANTS_LIST_URL = "viewname-tenant-list"',
-                obj=settings,
-                id='easy_tenants'
-            )
-        )
-
     return errors
