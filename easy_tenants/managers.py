@@ -8,6 +8,15 @@ from easy_tenants import get_current_tenant
 class CurrentTenant(models.Lookup):
     lookup_name = 'ct'
 
+    def as_sqlite(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        tenant = get_current_tenant()
+        params = lhs_params
+        # fix uuid(id) fields, char(32) without '-'
+        tenant_id = str(tenant.id).replace('-', '')
+
+        return "%s = '%s'" % (lhs, tenant_id), params
+
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         tenant = get_current_tenant()
@@ -30,19 +39,10 @@ def _tenant_manager_constructor(manager_class=models.Manager):
 
             return super().bulk_create(objs)
 
-        def contribute_to_class(self, model, name):
-            super().contribute_to_class(model, name)
-
-            models.signals.pre_save.connect(_set_tenant, model)
-
     manager = Manager()
     manager.tenant_manager = True
 
     return manager
-
-
-def _set_tenant(instance, **kwargs):
-    instance.tenant = get_current_tenant()
 
 
 TenantManager = _tenant_manager_constructor

@@ -13,9 +13,14 @@ def djasserts():
 
 
 @pytest.fixture
-def logged_client(django_user_model, client):
+def user(django_user_model):
+    user = django_user_model.objects.create_user('usertest')
+    return user
+
+
+@pytest.fixture
+def logged_client(user, client):
     """A Django test client instance with a new user authenticated."""
-    user = django_user_model.objects.create_user('user test')
     client.force_login(user)
     return client
 
