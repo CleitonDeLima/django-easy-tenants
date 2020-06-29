@@ -1,13 +1,16 @@
+import os
 import tempfile
+
+from dj_database_url import parse as db_url
 
 SECRET_KEY = 'any-key'
 ROOT_URLCONF = 'tests.urls'
+
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///tmp/tmp-sqlite.db')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }
+    'default': db_url(DATABASE_URL)
 }
+
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
