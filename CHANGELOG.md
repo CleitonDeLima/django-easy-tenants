@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.1] - (2020-07-01)
+
+- Removes middleware redirect to login responsibility
+
 ## [0.3.0] - (2020-07-01)
 
 - Changed how to ignore the use of tenants in views (using decorators and mixin)
