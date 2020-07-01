@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-easy-tenants"
-version = "0.2.3"
+version = "0.3.0"
 description = "Easy to create applications that use tenants in django"
 authors = ["Cleiton Lima <cleiton.limapin@gmail.com>"]
 license = "MIT"
