@@ -11,11 +11,9 @@ class TestDefaultMiddleware:
         expected = resolve_url(settings.EASY_TENANTS_REDIRECT_URL)
         djasserts.redirects(response, expected)
 
-    def test_when_user_is_not_authenticated(self, logged_client, djasserts,
-                                            settings):
+    def test_when_user_is_not_authenticated(self, client, djasserts, settings):
         """Redirect to login url"""
-        logged_client.logout()
-        response = logged_client.get('/')
+        response = client.get('/')  # login_required
         expected = '%s?next=%s' % (resolve_url(settings.LOGIN_URL), '/')
 
         djasserts.redirects(response, expected)

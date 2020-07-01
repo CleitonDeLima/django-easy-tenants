@@ -7,6 +7,7 @@ from easy_tenants import tenant_not_required
 from tests.models import Contact
 
 
+@login_required
 def home(request):
     return HttpResponse('in home')
 

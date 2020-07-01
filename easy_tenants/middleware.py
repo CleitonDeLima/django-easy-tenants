@@ -1,5 +1,4 @@
 from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import redirect
 
 from easy_tenants import get_tenant_model, set_current_tenant
@@ -40,11 +39,11 @@ class DefaultTenantMiddleware(AuthenticationMiddleware):
     a defined tenant.
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
+        if not request.user.is_authenticated:
+            return None
+
         request.tenant = _get_tenant(request)
         set_current_tenant(request.tenant)
 
         if not request.tenant and not _tenant_not_required(view_func):
-            if not request.user.is_authenticated:
-                return redirect_to_login(request.path)
-
             return redirect(settings.EASY_TENANTS_REDIRECT_URL)
