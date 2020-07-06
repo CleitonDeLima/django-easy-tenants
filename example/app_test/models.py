@@ -12,6 +12,13 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class TenantModel(TenantAbstract, BaseModel):
+    objects = TenantManager()
+
+    class Meta:
+        abstract = True
+
+
 class Customer(TenantMixin, BaseModel):
     name = models.CharField(max_length=50)
 
@@ -19,20 +26,16 @@ class Customer(TenantMixin, BaseModel):
         return self.name
 
 
-class Product(TenantAbstract, BaseModel):
+class Product(TenantModel):
     name = models.CharField(max_length=50)
     category = models.ForeignKey('app_test.Category', on_delete=models.CASCADE)
-
-    objects = TenantManager()
 
     def __str__(self):
         return self.name
 
 
-class Category(TenantAbstract, BaseModel):
+class Category(TenantModel):
     name = models.CharField(max_length=50)
-
-    objects = TenantManager()
 
     def __str__(self):
         return self.name

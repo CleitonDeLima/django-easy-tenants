@@ -3,6 +3,8 @@ from django.db.models import Field
 
 from easy_tenants import get_current_tenant
 
+FAKE_FILTER = 0
+
 
 @Field.register_lookup
 class CurrentTenant(models.Lookup):
@@ -25,24 +27,17 @@ class CurrentTenant(models.Lookup):
         return "%s = '%s'" % (lhs, tenant.id), params
 
 
-def _tenant_manager_constructor(manager_class=models.Manager):
-    class Manager(manager_class):
-        def get_queryset(self):
-            return super().get_queryset().filter(tenant__id__ct=0)
+class TenantManager(models.Manager):
+    tenant_manager = True
 
-        def bulk_create(self, objs):
-            tenant = get_current_tenant()
+    def get_queryset(self):
+        return super().get_queryset().filter(tenant__id__ct=FAKE_FILTER)
 
-            for obj in objs:
-                if hasattr(obj, 'tenant_id'):
-                    obj.tenant = tenant
+    def bulk_create(self, objs):
+        tenant = get_current_tenant()
 
-            return super().bulk_create(objs)
+        for obj in objs:
+            if hasattr(obj, 'tenant_id'):
+                obj.tenant = tenant
 
-    manager = Manager()
-    manager.tenant_manager = True
-
-    return manager
-
-
-TenantManager = _tenant_manager_constructor
+        return super().bulk_create(objs)

@@ -8,6 +8,7 @@ from tests.models import StoreTenant, Product, Contact
 def test_inheritance_tenant_model():
     assert TenantAbstract in Product.__mro__
     assert getattr(Product.objects, 'tenant_manager', False)
+    assert getattr(Contact.objects, 'tenant_manager', False)
 
 
 def test_tenant_mixin():

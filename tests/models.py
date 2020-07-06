@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from django.db.models import Manager
 
 from easy_tenants.managers import TenantManager
 from easy_tenants.models import TenantMixin, TenantAbstract
@@ -39,4 +38,4 @@ class Category(TenantAbstract):
 class Contact(TenantAbstract):
     name = models.CharField(max_length=10)
 
-    objects = TenantManager(Manager.from_queryset(ContactQuery))
+    objects = TenantManager.from_queryset(ContactQuery)()
