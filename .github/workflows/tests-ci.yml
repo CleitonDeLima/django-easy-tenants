@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  tests-postgresql:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,6 +23,8 @@ jobs:
           postgresql db: 'easy_tenants'
           postgresql user: 'postgres'
           postgresql password: 'postgres'
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/easy_tenants
         if: matrix.database == 'postgres'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -32,9 +34,6 @@ jobs:
         run: |
           pip install tox tox-gh-actions
       - name: Test ${{ matrix.python-version }}
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/easy_tenants
-        if: matrix.database == 'postgres'
         run: |
           tox
       - name: Upload coverage to Codecov
