@@ -36,7 +36,7 @@ jobs:
           pip install tox tox-gh-actions
       - name: Test ${{ matrix.python-version }}
         env:
-          DATABASE_URL: postgres://db_user:db_password@postgres:5432/db
+          DATABASE_URL: postgres://db_user:db_password@localhost:5432/db
         run: |
           tox
       - name: Upload coverage to Codecov
