@@ -42,7 +42,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: pytest, postgresql
+          flags: postgresql, py${{ matrix.python-version }}
           name: tests-postgresql
 
   tests-sqlite:
@@ -68,5 +68,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: pytest, sqlite
+          flags: sqlite, py${{ matrix.python-version }}
           name: tests-sqlite
