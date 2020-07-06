@@ -14,6 +14,7 @@ class EasyTenantsConfig(AppConfig):
 
         login_not_required_views = (
             views.LoginView,
+            views.LogoutView,
             views.PasswordResetView,
             views.PasswordResetDoneView,
             views.PasswordResetConfirmView,

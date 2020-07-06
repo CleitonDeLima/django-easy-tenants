@@ -58,10 +58,11 @@ class TestViewsTenantContext:
 class TestAuthView:
     @pytest.mark.parametrize('view', [
         auth_views.LoginView,
+        auth_views.LogoutView,
         auth_views.PasswordResetView,
         auth_views.PasswordResetDoneView,
         auth_views.PasswordResetConfirmView,
-        auth_views.PasswordResetCompleteView
+        auth_views.PasswordResetCompleteView,
     ])
     def test_has_tenant_required_with_false(self, view):
         assert hasattr(view, 'tenant_required')
