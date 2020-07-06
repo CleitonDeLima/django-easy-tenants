@@ -42,9 +42,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: pytest
-          name: codecov-umbrella
-          fail_ci_if_error: true
+          flags: pytest, postgresql
+          name: tests-postgresql
 
   tests-sqlite:
     runs-on: ubuntu-latest
@@ -69,5 +68,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: pytest
-          name: codecov-umbrella
+          flags: pytest, sqlite
+          name: tests-sqlite
