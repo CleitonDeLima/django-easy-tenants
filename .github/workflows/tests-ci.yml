@@ -9,22 +9,21 @@ on:
       - master
 
 jobs:
-  tests-postgresql:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.7, 3.8]
-    services:
-      postgres:
-        image: postgres:10-alpine
-        env:
-          POSTGRES_PASSWORD: db_password
-          POSTGRES_USER: db_user
-          POSTGRES_DB: db
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
+        database: [sqlite, postgres]
     steps:
       - uses: actions/checkout@v2
+      - uses: harmon758/postgresql-action@v1
+        with:
+          postgresql version: 11
+          postgresql db: 'easy_tenants'
+          postgresql user: 'postgres'
+          postgresql password: 'postgres'
+        if: matrix.database == 'postgres'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -34,7 +33,7 @@ jobs:
           pip install tox tox-gh-actions
       - name: Test ${{ matrix.python-version }}
         env:
-          DATABASE_URL: postgres://db_user:db_password@postgres:5432/db
+          DATABASE: ${{ matrix.database }}
         run: |
           tox
       - name: Upload coverage to Codecov
@@ -42,32 +41,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: pytest
-          name: codecov-umbrella
-          fail_ci_if_error: true
-
-  tests-sqlite:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8]
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install tox tox-gh-actions
-      - name: Test ${{ matrix.python-version }}
-        run: |
-          tox
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          flags: pytest
-          name: codecov-umbrella
+          flags: ${{ matrix.database }}, py${{ matrix.python-version }}
+          name: tests

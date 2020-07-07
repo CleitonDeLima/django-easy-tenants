@@ -1,14 +1,22 @@
-import os
 import tempfile
+from pathlib import Path
 
-from dj_database_url import parse as db_url
+import environ
+
+BASE_DIR = Path(__file__).parent
+
+env = environ.Env(
+    DATABASE=(str, 'sqlite')
+)
+
+envfile = BASE_DIR / 'configs' / f'{env("DATABASE")}.env'
+environ.Env.read_env(str(envfile))
 
 SECRET_KEY = 'any-key'
 ROOT_URLCONF = 'tests.urls'
 
-DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///tmp/tmp-sqlite.db')
 DATABASES = {
-    'default': db_url(DATABASE_URL)
+    'default': env.db()
 }
 
 MIDDLEWARE = [
