@@ -24,9 +24,9 @@ jobs:
           postgresql user: 'postgres'
           postgresql password: 'postgres'
         if: matrix.database == 'postgres'
-      - uses: getong/mariadb-action@v1.1
+      - uses: mirromutth/mysql-action@v1.1
         with:
-          mariadb version: '10.4'
+          mysql version: '10.4'
           mysql database: 'easy_tenants'
           mysql root password: '123'
         if: matrix.database == 'mysql'
