@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8]
-        database: [sqlite, postgres]
+        database: [sqlite, postgres, mysql]
     steps:
       - uses: actions/checkout@v2
       - uses: harmon758/postgresql-action@v1
@@ -23,9 +23,13 @@ jobs:
           postgresql db: 'easy_tenants'
           postgresql user: 'postgres'
           postgresql password: 'postgres'
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/easy_tenants
         if: matrix.database == 'postgres'
+      - uses: getong/mariadb-action@v1.1
+        with:
+          mariadb version: '10.4'
+          mysql database: 'easy_tenants'
+          mysql root password: '123'
+        if: matrix.database == 'mysql'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -34,6 +38,8 @@ jobs:
         run: |
           pip install tox tox-gh-actions
       - name: Test ${{ matrix.python-version }}
+        env:
+          DATABASE: ${{ matrix.database }}
         run: |
           tox
       - name: Upload coverage to Codecov
