@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8]
-        database: [sqlite, postgres, mysql]
+        database: [sqlite, postgres]
     steps:
       - uses: actions/checkout@v2
       - uses: harmon758/postgresql-action@v1
@@ -24,12 +24,6 @@ jobs:
           postgresql user: 'postgres'
           postgresql password: 'postgres'
         if: matrix.database == 'postgres'
-      - uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: '8.0'
-          mysql database: 'easy_tenants'
-          mysql root password: '123'
-        if: matrix.database == 'mysql'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
