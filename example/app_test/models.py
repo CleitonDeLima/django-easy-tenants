@@ -19,6 +19,11 @@ class TenantModel(TenantAbstract, BaseModel):
         abstract = True
 
 
+class CategoryQuerySet(models.QuerySet):
+    def start_by_xx(self):
+        return self.filter(name__startswith='xxx')
+
+
 class Customer(TenantMixin, BaseModel):
     name = models.CharField(max_length=50)
 
@@ -36,6 +41,8 @@ class Product(TenantModel):
 
 class Category(TenantModel):
     name = models.CharField(max_length=50)
+
+    objects = TenantManager.from_queryset(CategoryQuerySet)()
 
     def __str__(self):
         return self.name
