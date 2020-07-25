@@ -1,3 +1,4 @@
+import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from easy_tenants import set_current_tenant
@@ -24,3 +25,13 @@ def test_default_storage_without_tenant(settings):
     assert s.exists('test.txt')
     assert s.path('test.txt') == f'{settings.MEDIA_ROOT}/test.txt'
     assert s.url('test.txt') == f'{settings.MEDIA_URL}test.txt'
+
+
+def test_custom_base_location(tenant_ctx, settings):
+    location = f'{settings.MEDIA_ROOT}/2'
+    s = TenantFileSystemStorage(location=location, base_url='custom_url')
+    file = SimpleUploadedFile('test.txt', b'any content')
+    s.save('test.txt', file)
+    assert s.exists('test.txt')
+    assert s.path('test.txt') == f'{location}/test.txt'
+    assert s.url('test.txt') == 'custom_url/test.txt'
