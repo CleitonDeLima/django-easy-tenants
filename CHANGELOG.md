@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.3.3] - (2020-07-28)
+- Fix storage
+
 ## [0.3.2] - (2020-07-07)
 
 - Include tenant_required=False in LogoutView
