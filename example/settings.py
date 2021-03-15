@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'easy_tenants.middleware.DefaultTenantMiddleware',
+    'example.middleware.TenantMiddleware',
 ]
 
 ROOT_URLCONF = 'urls'

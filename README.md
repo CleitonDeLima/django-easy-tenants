@@ -6,28 +6,28 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/django-easy-tenants.svg)](https://img.shields.io/pypi/dm/django-easy-tenants.svg)
 
 
-This is a Django app for managing multiple tenants on the same project 
+This is a Django app for managing multiple tenants on the same project
 instance using a shared approach.
- 
- 
+
+
 ## Background
 
 There are typically three solutions for solving the multitenancy problem:
 
 1. Isolated Approach: Separate Databases. Each tenant has it’s own database.
-2. Semi Isolated Approach: Shared Database, Separate Schemas. 
+2. Semi Isolated Approach: Shared Database, Separate Schemas.
 One database for all tenants, but one schema per tenant.
-3. Shared Approach: Shared Database, Shared Schema. All tenants share 
-the same database and schema. There is a main tenant-table, where all 
+3. Shared Approach: Shared Database, Shared Schema. All tenants share
+the same database and schema. There is a main tenant-table, where all
 other tables have a foreign key pointing to.
 
-This application implements the third approach,  which in our opinion, 
+This application implements the third approach,  which in our opinion,
 is the best solution for a large amount of tenants.
 
 For more information: [Building Multi Tenant Applications with Django
 ](https://books.agiliq.com/projects/django-multi-tenant/en/latest/)
 
-Below is a demonstration of the features in each approach for an application 
+Below is a demonstration of the features in each approach for an application
 with 5000 tenants.
 
 Approach       | Number of DB | Number of Schemas | Django migration time | Public access
@@ -40,7 +40,7 @@ Shared         | 1            | 1                 | fast (1)              | Yes
 ## How it works
 The following image shows the flow of how this application works.
 
-![how to works](./screenshots/flux_easy_tenants.png) 
+![how to works](./screenshots/flux_easy_tenants.png)
 
 
 ## Instalation
@@ -52,8 +52,8 @@ Now you can import the tenancy module in your Django project.
 
 
 ## Setup
-It is recommended to install this app at the beginning of a project. 
-In an existing project, depending on the structure of the models, 
+It is recommended to install this app at the beginning of a project.
+In an existing project, depending on the structure of the models,
 the data migration can be hard.
 
 Add `easy_tenants` to your `INSTALLED_APPS` on `settings.py`.
@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     'easy_tenants',
 ]
 ```
-   
+
 Create a model which will be the tenant of the application.
 
 `yourapp/models.py`
@@ -76,7 +76,7 @@ class Customer(TenantMixin):
     ...
 ```
 
-Define on your `settings.py` which model is your tenant model. Assuming you created `Customer` 
+Define on your `settings.py` which model is your tenant model. Assuming you created `Customer`
 inside an app named `yourapp`, your EASY_TENANTS_MODEL should look like this:
 
 `settings.py`
@@ -99,95 +99,47 @@ class Product(TenantAbstract):
     objects = TenantManager()
 ```
 
-Add the middleware `easy_tenants.middleware.DefaultTenantMiddleware` to your middleware classes.  
-_Need to be included after `django.contrib.auth.middleware.AuthenticationMiddleware`._
+To obtain the data for each tenant, it is necessary to define which tenant will be used:
 
 ```python
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+from easy_tenants import set_current_tenant
 
-    'easy_tenants.middleware.DefaultTenantMiddleware',
-]
+customer = Customer.objects.first()
+set_current_tenant(customer)
+
+Product.objects.all()  # filter by customer
+
 ```
-
-Include the `django-easy-tenants` urls.
+or
 
 ```python
-path('easy-tenants/', include('easy_tenants.urls')),
+from easy_tenants import tenant_context
+
+with tenant_context(customer):
+    Product.objects.all()  # filter by customer
 ```
 
-You need to create a view that will list all your tenants and then 
-include the name of that view in the settings. This is how the user 
-chooses a tenant that will be saved in the user's session.
-
-`views.py`
-```python
-from django.shortcuts import render
-
-def tenant_list(request):
-    user_tenants = request.user.tenants.all()
-    return render(request, 'tenant_list.html', {
-        'object_list': user_tenants
-    })
-```
-
-`tenant_list.html`
-```html
-...
-<ul>
-  {% for object in object_list %}
-    <li>
-      <form action="{% url 'easy_tenants:set-current-tenant' object.pk %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Use {{ object.name }}</button>
-      </form>
-    </li>
-  {% endfor %}
-</ul>
-...
-```
-
-`urls.py`
-```python
-path('tenants/', tenant_list, name='tenant-list'),
-```
-
-`settings.py`
-```python
-EASY_TENANTS_REDIRECT_URL = 'tenant-list'
-```
-
-After choosing the tenant, the user is redirected to a URL defined in the 
-settings `EASY_TENANTS_SUCCESS_URL`.
-
-`settings.py`
-```python
-EASY_TENANTS_SUCCESS_URL = 'home'
-```  
-
-If a URL is accessed and there is no tenant defined in the session, the user is redirected to 
-`EASY_TENANTS_REDIRECT_URL`. If you want to ignore some views you can add a mixin or decorator to your view, 
-like below.  
-(views of `django.contrib.auth` that do not require authentication are ignored)
+To define the tenant to be used, this will depend on the business rule used. Here is an example for creating middleware that defines a tenant:
 
 ```python
-from easy_tenants import TenantNotRequiredMixin, tenant_not_required
+from django.http import HttpResponse
+from easy_tenants import tenant_context
 
-class MyView(TenantNotRequiredMixin, View):
-    ...
+class TenantMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-@tenant_not_required
-def my_view(request):
-    ...
+    def __call__(self, request):
+        customer = get_customer_by_request(request)
+
+        if not customer:
+            return HttpResponse("Select tenant")
+
+        with tenant_context(customer):
+            return self.get_response(request)
 ```
 
-If you want to separate the upload files by tenant, you need to change the `DEFAULT_FILE_STORAGE` 
+If you want to separate the upload files by tenant, you need to change the `DEFAULT_FILE_STORAGE`
 configuration (only available for local files).
 
 ```python
@@ -205,6 +157,6 @@ python manage.py runserver
 Access the page `/admin/`, create a `Customer` and then add a user on the created `Customer`.
 
 ## Motivation
-[django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)  
-[django-tenants](https://github.com/tomturner/django-tenants)  
-[django-scopes](https://github.com/raphaelm/django-scopes)  
+[django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+[django-tenants](https://github.com/tomturner/django-tenants)
+[django-scopes](https://github.com/raphaelm/django-scopes)
