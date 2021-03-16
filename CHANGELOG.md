@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.0] - (2021-03-16)
+- Remove middleware dependency in project (#16)
+
 ## [0.3.3] - (2020-07-28)
 - Fix storage
 
