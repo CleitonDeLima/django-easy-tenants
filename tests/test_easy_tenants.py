@@ -2,7 +2,7 @@ from easy_tenants import (
     get_tenant_model,
     set_current_tenant,
     get_current_tenant,
-    tenant_context
+    tenant_context,
 )
 from tests.models import StoreTenant
 

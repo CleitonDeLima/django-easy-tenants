@@ -9,15 +9,15 @@ thread_local = threading.local()
 
 
 def get_tenant_model():
-    return apps.get_model(*settings.EASY_TENANTS_MODEL.split('.'))
+    return apps.get_model(*settings.EASY_TENANTS_MODEL.split("."))
 
 
 def get_current_tenant():
-    return getattr(thread_local, 'tenant', None)
+    return getattr(thread_local, "tenant", None)
 
 
 def set_current_tenant(tenant):
-    setattr(thread_local, 'tenant', tenant)
+    setattr(thread_local, "tenant", tenant)
 
 
 @contextmanager

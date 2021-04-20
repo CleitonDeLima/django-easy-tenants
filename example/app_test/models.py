@@ -21,7 +21,7 @@ class TenantModel(TenantAbstract, BaseModel):
 
 class CategoryQuerySet(models.QuerySet):
     def start_by_xx(self):
-        return self.filter(name__startswith='xxx')
+        return self.filter(name__startswith="xxx")
 
 
 class Customer(TenantMixin, BaseModel):
@@ -33,7 +33,7 @@ class Customer(TenantMixin, BaseModel):
 
 class Product(TenantModel):
     name = models.CharField(max_length=50)
-    category = models.ForeignKey('app_test.Category', on_delete=models.CASCADE)
+    category = models.ForeignKey("app_test.Category", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

@@ -9,17 +9,17 @@ from tests.models import Contact
 
 @login_required
 def home(request):
-    return HttpResponse('in home')
+    return HttpResponse("in home")
 
 
 @login_required
 @tenant_not_required
 def store_list(request):
-    return HttpResponse('store lists')
+    return HttpResponse("store lists")
 
 
 class ContactListView(ListView):
-    template_name = 'tests/contact_list.html'
+    template_name = "tests/contact_list.html"
     queryset = Contact.objects.by_phone()
 
 

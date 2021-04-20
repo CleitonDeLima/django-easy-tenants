@@ -4,7 +4,7 @@ from example.app_test.models import Customer, Product, Category
 
 
 class CustomerAdmin(admin.ModelAdmin):
-    filter_horizontal = ['users']
+    filter_horizontal = ["users"]
 
 
 admin.site.register(Customer, CustomerAdmin)

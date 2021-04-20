@@ -4,6 +4,7 @@ import pytest
 @pytest.fixture
 def djasserts():
     from django.test import TestCase
+
     testcase = TestCase()
 
     class Asserts:
@@ -14,7 +15,7 @@ def djasserts():
 
 @pytest.fixture
 def user(django_user_model):
-    user = django_user_model.objects.create_user('usertest')
+    user = django_user_model.objects.create_user("usertest")
     return user
 
 

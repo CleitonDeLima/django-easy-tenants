@@ -8,14 +8,14 @@ FAKE_FILTER = 0
 
 @Field.register_lookup
 class CurrentTenant(models.Lookup):
-    lookup_name = 'ct'
+    lookup_name = "ct"
 
     def as_sqlite(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         tenant = get_current_tenant()
         params = lhs_params
         # fix uuid(id) fields, char(32) without '-'
-        tenant_id = str(tenant.id).replace('-', '')
+        tenant_id = str(tenant.id).replace("-", "")
 
         return "%s = '%s'" % (lhs, tenant_id), params
 
@@ -37,7 +37,7 @@ class TenantManager(models.Manager):
         tenant = get_current_tenant()
 
         for obj in objs:
-            if hasattr(obj, 'tenant_id'):
+            if hasattr(obj, "tenant_id"):
                 obj.tenant = tenant
 
         return super().bulk_create(objs)

@@ -8,10 +8,7 @@ from example.app_test.models import Customer
 
 @login_required
 def home(request):
-    html = (
-        '<h1>Home page</h1>'
-        '<a href="/admin/">admin</a>'
-    )
+    html = "<h1>Home page</h1>" '<a href="/admin/">admin</a>'
     return HttpResponse(html)
 
 
@@ -19,6 +16,4 @@ def home(request):
 @tenant_not_required
 def customer_list(request):
     customers = Customer.objects.all()
-    return render(request, 'customer_list.html', {
-        'object_list': customers
-    })
+    return render(request, "customer_list.html", {"object_list": customers})

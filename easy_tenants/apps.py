@@ -5,11 +5,12 @@ from easy_tenants.checks import check_settings
 
 
 class EasyTenantsConfig(AppConfig):
-    name = 'easy_tenants'
-    verbose_name = 'Easy Tenants'
+    name = "easy_tenants"
+    verbose_name = "Easy Tenants"
 
     def ready(self):
         from django.contrib.auth import views
+
         checks.register(check_settings, checks.Tags.compatibility)
 
         login_not_required_views = (
@@ -18,7 +19,7 @@ class EasyTenantsConfig(AppConfig):
             views.PasswordResetView,
             views.PasswordResetDoneView,
             views.PasswordResetConfirmView,
-            views.PasswordResetCompleteView
+            views.PasswordResetCompleteView,
         )
         for view in login_not_required_views:
             view.tenant_required = False

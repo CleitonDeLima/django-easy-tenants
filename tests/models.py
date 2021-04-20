@@ -8,7 +8,7 @@ from easy_tenants.models import TenantMixin, TenantAbstract
 
 class ContactQuery(models.QuerySet):
     def by_phone(self):
-        return self.filter(name__startswith='phone')
+        return self.filter(name__startswith="phone")
 
 
 class StoreTenant(TenantMixin):
@@ -17,8 +17,9 @@ class StoreTenant(TenantMixin):
 
 class Product(TenantAbstract):
     name = models.CharField(max_length=10)
-    category = models.ForeignKey('tests.Category', null=True,
-                                 on_delete=models.SET_NULL)
+    category = models.ForeignKey(
+        "tests.Category", null=True, on_delete=models.SET_NULL
+    )
 
     objects = TenantManager()
 

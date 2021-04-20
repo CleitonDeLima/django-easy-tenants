@@ -3,7 +3,7 @@
 from appconf import AppConf
 from django.conf import settings  # NOQA
 
-__all__ = ('settings', 'EasyTenantsAppConf')
+__all__ = ("settings", "EasyTenantsAppConf")
 
 
 class EasyTenantsAppConf(AppConf):
@@ -11,7 +11,7 @@ class EasyTenantsAppConf(AppConf):
     IGNORE_URLS = []
     REDIRECT_URL = None
     SUCCESS_URL = None
-    SESSION_KEY = 'tenant_id'
+    SESSION_KEY = "tenant_id"
 
     class Meta:
-        prefix = 'EASY_TENANTS'
+        prefix = "EASY_TENANTS"

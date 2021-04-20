@@ -6,8 +6,7 @@ from easy_tenants.conf import settings
 
 class TenantMixin(models.Model):
     users = models.ManyToManyField(
-        to=settings.AUTH_USER_MODEL,
-        related_name='tenants'
+        to=settings.AUTH_USER_MODEL, related_name="tenants"
     )
 
     class Meta:
@@ -16,9 +15,7 @@ class TenantMixin(models.Model):
 
 class TenantAbstract(models.Model):
     tenant = models.ForeignKey(
-        to=settings.EASY_TENANTS_MODEL,
-        on_delete=models.CASCADE,
-        editable=False
+        to=settings.EASY_TENANTS_MODEL, on_delete=models.CASCADE, editable=False
     )
 
     all_objects = models.Manager()
