@@ -1,4 +1,3 @@
-import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from easy_tenants import set_current_tenant

@@ -1,19 +1,10 @@
-from django.db.models.fields.related_descriptors import ManyToManyDescriptor
-
-from easy_tenants import tenant_context, get_current_tenant
+from easy_tenants import get_current_tenant, tenant_context
 from easy_tenants.models import TenantAbstract
-from tests.models import StoreTenant, Product, Contact
+from tests.models import Contact, Product, StoreTenant
 
 
 def test_inheritance_tenant_model():
     assert TenantAbstract in Product.__mro__
-    assert getattr(Product.objects, "tenant_manager", False)
-    assert getattr(Contact.objects, "tenant_manager", False)
-
-
-def test_tenant_mixin():
-    assert hasattr(StoreTenant, "users")
-    assert isinstance(StoreTenant.users, ManyToManyDescriptor)
 
 
 def test_create_object(tenant_ctx):

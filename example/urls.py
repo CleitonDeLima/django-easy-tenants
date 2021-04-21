@@ -1,15 +1,15 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
-from example.app_test.views import home, customer_list
+from example.app_test.views import customer_list, home, set_tenant
 
 urlpatterns = [
     path("", home, name="home"),
     path("customers/", customer_list, name="customer-list"),
+    path("set-tenant/<str:pk>/", set_tenant, name="set-tenant"),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("easy-tenants/", include("easy_tenants.urls")),
 ]
 
 if settings.DEBUG:

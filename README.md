@@ -70,9 +70,9 @@ Create a model which will be the tenant of the application.
 
 `yourapp/models.py`
 ```python
-from easy_tenants.models import TenantMixin
+from django.db import models
 
-class Customer(TenantMixin):
+class Customer(models.Model):
     ...
 ```
 

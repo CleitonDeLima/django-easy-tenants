@@ -1,8 +1,9 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
-from easy_tenants.models import TenantMixin, TenantAbstract
-from easy_tenants.managers import TenantManager
+
+from easy_tenants.models import TenantAbstract, TenantManager
 
 
 class BaseModel(models.Model):
@@ -24,8 +25,12 @@ class CategoryQuerySet(models.QuerySet):
         return self.filter(name__startswith="xxx")
 
 
-class Customer(TenantMixin, BaseModel):
+class Customer(BaseModel):
     name = models.CharField(max_length=50)
+    users = models.ManyToManyField(
+        to=settings.AUTH_USER_MODEL,
+        related_name="tenants",
+    )
 
     def __str__(self):
         return self.name

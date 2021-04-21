@@ -129,5 +129,3 @@ INTERNAL_IPS = [
 ]
 
 EASY_TENANTS_MODEL = "app_test.Customer"
-EASY_TENANTS_REDIRECT_URL = "customer-list"
-EASY_TENANTS_SUCCESS_URL = "home"

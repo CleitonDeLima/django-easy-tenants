@@ -2,8 +2,7 @@ import uuid
 
 from django.db import models
 
-from easy_tenants.managers import TenantManager
-from easy_tenants.models import TenantMixin, TenantAbstract
+from easy_tenants.models import TenantAbstract, TenantManager
 
 
 class ContactQuery(models.QuerySet):
@@ -11,7 +10,7 @@ class ContactQuery(models.QuerySet):
         return self.filter(name__startswith="phone")
 
 
-class StoreTenant(TenantMixin):
+class StoreTenant(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 

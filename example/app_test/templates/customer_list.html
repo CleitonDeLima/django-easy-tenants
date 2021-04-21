@@ -9,7 +9,7 @@
 <ul>
   {% for object in object_list %}
     <li>
-      <form action="{% url 'easy_tenants:set-current-tenant' object.pk %}" method="post">
+      <form action="{% url 'set-tenant' object.pk %}" method="post">
         {% csrf_token %}
         <button type="submit">Use {{ object.name }}</button>
       </form>

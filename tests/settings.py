@@ -41,8 +41,6 @@ TEMPLATES = [
 ]
 
 EASY_TENANTS_MODEL = "tests.StoreTenant"
-EASY_TENANTS_REDIRECT_URL = "store-list"
-EASY_TENANTS_SUCCESS_URL = "home"
 
 MEDIA_ROOT = tempfile.gettempdir()
 MEDIA_URL = "/media/"

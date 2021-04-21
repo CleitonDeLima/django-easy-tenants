@@ -5,8 +5,7 @@ from easy_tenants.conf import settings
 
 
 def check_settings(app_configs, **kwargs):
-    from easy_tenants.managers import TenantManager
-    from easy_tenants.models import TenantAbstract
+    from easy_tenants.models import TenantAbstract, TenantManager
 
     errors = []
 
