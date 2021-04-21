@@ -102,17 +102,6 @@ class Product(TenantAbstract):
 To obtain the data for each tenant, it is necessary to define which tenant will be used:
 
 ```python
-from easy_tenants import set_current_tenant
-
-customer = Customer.objects.first()
-set_current_tenant(customer)
-
-Product.objects.all()  # filter by customer
-
-```
-or
-
-```python
 from easy_tenants import tenant_context
 
 with tenant_context(customer):

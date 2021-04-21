@@ -4,8 +4,9 @@ from contextlib import contextmanager
 from django.apps import apps
 
 from easy_tenants.conf import settings
+from easy_tenants.exceptions import TenantError
 
-thread_local = threading.local()
+state_local = threading.local()
 
 
 def get_tenant_model():
@@ -13,16 +14,40 @@ def get_tenant_model():
 
 
 def get_current_tenant():
-    return getattr(thread_local, "tenant", None)
+    state = getattr(state_local, "state", None)
+
+    if state["enabled"] and state["tenant"] is None:
+        raise TenantError("Tenant is required in context.")
+
+    return state["tenant"]
 
 
-def set_current_tenant(tenant):
-    setattr(thread_local, "tenant", tenant)
+def get_state():
+    state_default = {
+        "enabled": True,
+        "tenant": None,
+    }
+    state = getattr(state_local, "state", state_default)
+    return state
 
 
 @contextmanager
-def tenant_context(tenant):
-    previous_tenant = get_current_tenant()
-    set_current_tenant(tenant)
-    yield
-    set_current_tenant(previous_tenant)
+def tenant_context(tenant=None, enabled=True):
+    previous_state = get_state()
+
+    new_state = previous_state.copy()
+    new_state["enabled"] = enabled
+    new_state["tenant"] = tenant
+
+    state_local.state = new_state
+
+    try:
+        yield
+    finally:
+        state_local.state = previous_state
+
+
+@contextmanager
+def tenant_context_disabled():
+    with tenant_context(enabled=False):
+        yield

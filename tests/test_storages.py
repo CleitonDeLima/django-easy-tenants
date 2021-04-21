@@ -1,6 +1,6 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from easy_tenants import set_current_tenant
+from easy_tenants import tenant_context_disabled
 from easy_tenants.storage import TenantFileSystemStorage
 
 
@@ -16,14 +16,14 @@ def test_default_storage(tenant_ctx, settings):
 
 
 def test_default_storage_without_tenant(settings):
-    set_current_tenant(None)
-    s = TenantFileSystemStorage()
-    file = SimpleUploadedFile("test.txt", b"any content")
-    s.save("test.txt", file)
+    with tenant_context_disabled():
+        s = TenantFileSystemStorage()
+        file = SimpleUploadedFile("test.txt", b"any content")
+        s.save("test.txt", file)
 
-    assert s.exists("test.txt")
-    assert s.path("test.txt") == f"{settings.MEDIA_ROOT}/test.txt"
-    assert s.url("test.txt") == f"{settings.MEDIA_URL}test.txt"
+        assert s.exists("test.txt")
+        assert s.path("test.txt") == f"{settings.MEDIA_ROOT}/test.txt"
+        assert s.url("test.txt") == f"{settings.MEDIA_URL}test.txt"
 
 
 def test_custom_base_location(tenant_ctx, settings):

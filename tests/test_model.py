@@ -1,4 +1,11 @@
-from easy_tenants import get_current_tenant, tenant_context
+import pytest
+
+from easy_tenants import (
+    get_current_tenant,
+    tenant_context,
+    tenant_context_disabled,
+)
+from easy_tenants.exceptions import TenantError
 from easy_tenants.models import TenantAbstract
 from tests.models import Contact, Product, StoreTenant
 
@@ -12,7 +19,7 @@ def test_create_object(tenant_ctx):
     assert Product.objects.count()
 
 
-def test_autoset_current_tenant_in_instance_model(tenant_ctx):
+def test_set_tenant_in_instance_model(tenant_ctx):
     prod = Product.objects.create(name="prod1")
     assert prod.tenant_id
 
@@ -55,8 +62,17 @@ def test_all_objects(db):
     store2 = StoreTenant.objects.create()
     with tenant_context(store1):
         Product.objects.create(name="prod1")
+        Product.objects.count() == 1
 
     with tenant_context(store2):
         Product.objects.create(name="prod2")
+        Product.objects.count() == 1
 
-    assert Product.all_objects.count() == 2
+    with tenant_context_disabled():
+        assert Product.objects.count() == 2
+
+
+def test_tenant_required_error(db):
+    with pytest.raises(TenantError):
+        with tenant_context():
+            Product.objects.create(name="prod1")

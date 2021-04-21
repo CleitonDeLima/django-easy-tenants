@@ -1,0 +1,2 @@
+class TenantError(Exception):
+    pass

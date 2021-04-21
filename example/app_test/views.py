@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from easy_tenants import get_tenant_model, set_current_tenant
+from easy_tenants import get_tenant_model
 from example.app_test.models import Customer
 
 
@@ -38,7 +38,6 @@ def set_tenant(request, pk):
     """
     Tenant = get_tenant_model()
     tenant = get_object_or_404(Tenant, pk=pk)
-    set_current_tenant(tenant)
-    request.session["tenant_id"] = pk
+    request.session["tenant_id"] = str(tenant.id)
 
     return redirect("home")
