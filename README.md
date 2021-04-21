@@ -40,7 +40,7 @@ Shared         | 1            | 1                 | fast (1)              | Yes
 ## Instalation
 Assuming you have django installed, the first step is to install `django-easy-tenants`.
 ```bash
-pip install django-easy-tenants
+python -m pip install django-easy-tenants
 ```
 Now you can import the tenancy module in your Django project.
 
@@ -134,12 +134,14 @@ DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py shell # create 2 customers
+python manage.py shell # create 2 customers and include user in customer
 python manage.py runserver
 ```
 Access the page `/admin/`, create a `Customer` and then add a user on the created `Customer`.
 
 ## Motivation
 [django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+
 [django-tenants](https://github.com/tomturner/django-tenants)
+
 [django-scopes](https://github.com/raphaelm/django-scopes)
