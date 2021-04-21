@@ -37,12 +37,6 @@ Semi Isolated  | 1            | 5000              | slow (1/Schema)       | Yes
 Shared         | 1            | 1                 | fast (1)              | Yes
 
 
-## How it works
-The following image shows the flow of how this application works.
-
-![how to works](./screenshots/flux_easy_tenants.png)
-
-
 ## Instalation
 Assuming you have django installed, the first step is to install `django-easy-tenants`.
 ```bash
