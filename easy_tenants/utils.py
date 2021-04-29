@@ -14,7 +14,7 @@ def get_tenant_model():
 
 
 def get_current_tenant():
-    state = getattr(state_local, "state", None)
+    state = get_state()
 
     if state["enabled"] and state["tenant"] is None:
         raise TenantError("Tenant is required in context.")
