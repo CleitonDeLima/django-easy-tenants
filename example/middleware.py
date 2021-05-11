@@ -28,7 +28,11 @@ class TenantMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         # avoid loop in customer-list
-        if not self.tenant and not self.tenant_not_required(view_func):
+        if (
+            request.user.is_authenticated
+            and not self.tenant
+            and not self.tenant_not_required(view_func)
+        ):
             return redirect("customer-list")
 
     def __call__(self, request):
