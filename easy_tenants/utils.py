@@ -13,15 +13,6 @@ def get_tenant_model():
     return apps.get_model(*settings.EASY_TENANTS_MODEL.split("."))
 
 
-def get_current_tenant():
-    state = getattr(state_local, "state", None)
-
-    if state["enabled"] and state["tenant"] is None:
-        raise TenantError("Tenant is required in context.")
-
-    return state["tenant"]
-
-
 def get_state():
     state_default = {
         "enabled": True,
@@ -29,6 +20,15 @@ def get_state():
     }
     state = getattr(state_local, "state", state_default)
     return state
+
+
+def get_current_tenant():
+    state = get_state()
+
+    if state["enabled"] and state["tenant"] is None:
+        raise TenantError("Tenant is required in context.")
+
+    return state["tenant"]
 
 
 @contextmanager

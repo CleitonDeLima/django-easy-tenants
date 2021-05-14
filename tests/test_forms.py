@@ -1,8 +1,7 @@
 from django import forms
 
-from tests.models import Product, Category, StoreTenant
-
 from easy_tenants import tenant_context
+from tests.models import Category, Product, StoreTenant
 
 
 def test_modelfield_contents(tenant_ctx):
