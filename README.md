@@ -37,7 +37,7 @@ Semi Isolated  | 1            | 5000              | slow (1/Schema)       | Yes
 Shared         | 1            | 1                 | fast (1)              | Yes
 
 
-## Instalation
+## Installation
 Assuming you have django installed, the first step is to install `django-easy-tenants`.
 ```bash
 python -m pip install django-easy-tenants
