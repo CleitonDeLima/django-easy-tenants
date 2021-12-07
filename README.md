@@ -84,8 +84,7 @@ and the objects need to be replaced by `TenantManager()`.
 
 ```python
 from django.db import models
-from easy_tenants.models import TenantAbstract
-from easy_tenants.managers import TenantManager
+from easy_tenants.models import TenantAbstract, TenantManager
 
 class Product(TenantAbstract):
     name = models.CharField(max_length=10)
