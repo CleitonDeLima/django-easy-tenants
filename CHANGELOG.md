@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.1] - (2021-12-16)
+- Fixed tox tests
+- Fixed RemovedInDjango41Warning default_app_config (#19)
+
 ## [0.4.0] - (2021-03-16)
 - Remove middleware dependency in project (#16)
 
