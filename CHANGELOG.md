@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.6.0] - (2021-12-16)
+- Fixed tox tests
+
 ## [0.5.1] - (2021-12-16)
 - Fixed tox tests
 - Fixed RemovedInDjango41Warning default_app_config (#19)
