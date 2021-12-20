@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.6.1] - (2021-12-16)
+- Fixed project version
+
 ## [0.6.0] - (2021-12-16)
 - Fixed tox tests
 
