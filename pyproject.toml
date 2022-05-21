@@ -28,7 +28,7 @@ django-appconf = "^1.0.4"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
 pytest-django = "^4.5.2"
-pytest-cov = "^2.8.1"
+pytest-cov = "^3.0.0"
 ipython = "^7.16.3"
 tox = "^3.14.6"
 tox-gh-actions = "^1.2.0"
