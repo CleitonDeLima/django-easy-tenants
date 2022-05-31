@@ -1,5 +1,3 @@
-import django
-
 from easy_tenants.utils import (
     get_current_tenant,
     get_tenant_model,
@@ -13,6 +11,3 @@ __all__ = [
     "tenant_context",
     "tenant_context_disabled",
 ]
-
-if django.VERSION < (3, 2):
-    default_app_config = "easy_tenants.apps.EasyTenantsConfig"
