@@ -29,8 +29,9 @@ def logged_client(user, client):
 @pytest.fixture
 def tenant_ctx(db):
     """Create a tenant a set context"""
-    from easy_tenants import tenant_context, get_tenant_model
+    from easy_tenants import tenant_context
+    from tests.models import StoreTenant
 
-    tenant = get_tenant_model().objects.create()
+    tenant = StoreTenant.objects.create()
     with tenant_context(tenant):
         yield tenant

@@ -1,9 +1,5 @@
-from easy_tenants import get_current_tenant, get_tenant_model, tenant_context
+from easy_tenants import get_current_tenant, tenant_context
 from tests.models import StoreTenant
-
-
-def test_get_tenant_model():
-    assert StoreTenant == get_tenant_model()
 
 
 def test_get_and_set_current_tenant_thread_local(db):

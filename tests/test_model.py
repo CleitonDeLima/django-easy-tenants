@@ -6,12 +6,7 @@ from easy_tenants import (
     tenant_context_disabled,
 )
 from easy_tenants.exceptions import TenantError
-from easy_tenants.models import TenantAbstract
 from tests.models import Contact, Product, StoreTenant
-
-
-def test_inheritance_tenant_model():
-    assert TenantAbstract in Product.__mro__
 
 
 def test_create_object(tenant_ctx):

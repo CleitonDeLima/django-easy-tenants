@@ -40,8 +40,6 @@ TEMPLATES = [
     },
 ]
 
-EASY_TENANTS_MODEL = "tests.StoreTenant"
-
 MEDIA_ROOT = tempfile.gettempdir()
 MEDIA_URL = "/media/"
 

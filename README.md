@@ -70,23 +70,16 @@ class Customer(models.Model):
     ...
 ```
 
-Define on your `settings.py` which model is your tenant model. Assuming you created `Customer`
-inside an app named `yourapp`, your EASY_TENANTS_MODEL should look like this:
-
-`settings.py`
-```python
-EASY_TENANTS_MODEL = 'yourapp.Customer'
-```
-
-Your models, that should have data isolated by tenant, need to inherit from `TenantAbstract`
-and the objects need to be replaced by `TenantManager()`.
+Your models, which must have isolated data per tenant, we need to add the foreign field from the Customer model.
+and objects need to be replaced with `TenantManager()`.
 
 
 ```python
 from django.db import models
-from easy_tenants.models import TenantAbstract, TenantManager
+from easy_tenants.models import TenantManager
 
-class Product(TenantAbstract):
+class Product(models.Model):
+    tenant = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
     name = models.CharField(max_length=10)
 
     objects = TenantManager()

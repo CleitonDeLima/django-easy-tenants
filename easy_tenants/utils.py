@@ -1,16 +1,9 @@
 import threading
 from contextlib import contextmanager
 
-from django.apps import apps
-
-from easy_tenants.conf import settings
 from easy_tenants.exceptions import TenantError
 
 state_local = threading.local()
-
-
-def get_tenant_model():
-    return apps.get_model(*settings.EASY_TENANTS_MODEL.split("."))
 
 
 def get_state():

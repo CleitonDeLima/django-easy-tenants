@@ -3,7 +3,6 @@ from django.db.models.expressions import BaseExpression
 from django.db.models.functions import Cast
 
 from easy_tenants import get_current_tenant
-from easy_tenants.conf import settings
 from easy_tenants.utils import get_state
 
 
@@ -36,20 +35,3 @@ class TenantManager(models.Manager):
                 obj.tenant = tenant
 
         return super().bulk_create(objs)
-
-
-class TenantAbstract(models.Model):
-    tenant = models.ForeignKey(
-        to=settings.EASY_TENANTS_MODEL,
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-
-    class Meta:
-        abstract = True
-
-    def save(self, *args, **kwargs):
-        if not self.tenant_id:
-            self.tenant = get_current_tenant()
-
-        super().save(*args, **kwargs)
