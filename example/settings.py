@@ -128,4 +128,4 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-EASY_TENANTS_MODEL = "app_test.Customer"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

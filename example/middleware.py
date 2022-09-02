@@ -1,7 +1,8 @@
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 
-from easy_tenants import get_tenant_model, tenant_context
+from easy_tenants import tenant_context
+from example.app_test.models import Customer
 
 
 class TenantMiddleware(MiddlewareMixin):
@@ -22,7 +23,7 @@ class TenantMiddleware(MiddlewareMixin):
         tenant_id = request.session.get(SESSION_KEY, None)
 
         if tenant_id:
-            tenant = get_tenant_model().objects.filter(id=tenant_id).first()
+            tenant = Customer.objects.filter(id=tenant_id).first()
 
         return tenant
 
