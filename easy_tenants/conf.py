@@ -7,7 +7,7 @@ __all__ = ("settings", "EasyTenantsAppConf")
 
 
 class EasyTenantsAppConf(AppConf):
-    MODEL = None
+    TENANT_FIELD = "tenant"
 
     class Meta:
         prefix = "EASY_TENANTS"

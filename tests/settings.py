@@ -44,3 +44,5 @@ MEDIA_ROOT = tempfile.gettempdir()
 MEDIA_URL = "/media/"
 
 STATIC_URL = "/static/"
+
+EASY_TENANTS_TENANT_FIELD = "store"
