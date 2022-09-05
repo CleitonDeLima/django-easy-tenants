@@ -1,12 +1,20 @@
 from django.contrib import admin
 
-from example.app_test.models import Customer, Product, Category
+from example.app_test.models import Category, Customer, Product
 
 
 class CustomerAdmin(admin.ModelAdmin):
-    filter_horizontal = ["users"]
+    ...
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_filter = ["tenant"]
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_filter = ["tenant"]
 
 
 admin.site.register(Customer, CustomerAdmin)
-admin.site.register(Product)
-admin.site.register(Category)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Category, CategoryAdmin)

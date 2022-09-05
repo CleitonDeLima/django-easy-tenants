@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Customer list</title>
-</head>
-<body>
-<h1>Customer list (set tenant)</h1>
-<ul>
-  {% for object in object_list %}
-    <li>
-      <form action="{% url 'set-tenant' object.pk %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Use {{ object.name }}</button>
-      </form>
-    </li>
-  {% endfor %}
-</ul>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block body %}
+  <h1>Customer list (set tenant)</h1>
+  <ul>
+    {% for customer in customer_list %}
+      <li>
+        <form action="{% url 'set-tenant' customer.pk %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Use {{ customer.name }}</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

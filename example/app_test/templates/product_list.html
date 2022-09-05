@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Product</title>
-</head>
-<body>
-<h1>Product create</h1>
-<a href="{% url 'admin:index' %}">Admin</a>
-<hr>
-<a href="{% url 'product-create' %}">new</a>
-<ul>
-  {% for object in object_list %}
-    <li>{{ object.name }}</li>
-  {% endfor %}
-</ul>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block body %}
+  <ul>
+    <li>
+      <a href="{% url 'product-create' %}">New product</a>
+    </li>
+  </ul>
+
+  <ul>
+    {% for product in product_list %}
+      <li>{{ product.name }} | cat {{ product.category }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
