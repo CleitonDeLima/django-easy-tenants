@@ -16,7 +16,7 @@ def test_create_object(tenant_ctx):
 
 def test_set_tenant_in_instance_model(tenant_ctx):
     prod = Product.objects.create(name="prod1")
-    assert prod.tenant_id
+    assert prod.get_tenant_instance()
 
 
 def test_get_objects_of_tenant(db):
@@ -48,8 +48,8 @@ def test_bulk_create(tenant_ctx):
     tenant = get_current_tenant()
 
     assert Product.objects.count() == 2
-    assert objs[0].tenant == tenant
-    assert objs[1].tenant == tenant
+    assert objs[0].get_tenant_instance() == tenant
+    assert objs[1].get_tenant_instance() == tenant
 
 
 def test_all_objects(db):
