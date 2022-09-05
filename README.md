@@ -85,6 +85,32 @@ class Product(models.Model):
     objects = TenantManager()
 ```
 
+If you prefer you can use `TenantAwareAbstract` to implement the save method for you,
+so when saving an object the tenant will be automatically defined.
+
+```python
+class Product(TenantAwareAbstract):
+    tenant = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
+    name = models.CharField(max_length=10)
+
+    objects = TenantManager()
+```
+
+
+If your foreign field has a name other than `tenant` you can change it with a settings. (default is `"tenant"`)
+
+```python
+# models.py
+class Product(TenantAwareAbstract):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
+    name = models.CharField(max_length=10)
+
+    objects = TenantManager()
+
+# settings.py
+EASY_TENANTS_TENANT_FIELD = "customer"
+```
+
 To obtain the data for each tenant, it is necessary to define which tenant will be used:
 
 ```python
