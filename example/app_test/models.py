@@ -1,35 +1,22 @@
-from django.conf import settings
 from django.db import models
 
-from easy_tenants.models import TenantManager, get_current_tenant
+from easy_tenants.models import TenantAwareAbstract, TenantManager
 
 
 class Customer(models.Model):
     name = models.CharField(max_length=50)
-    users = models.ManyToManyField(
-        to=settings.AUTH_USER_MODEL,
-        related_name="tenants",
-    )
 
     def __str__(self):
         return self.name
 
 
-class TenantModel(models.Model):
-    tenant = models.ForeignKey(
-        to=Customer, on_delete=models.CASCADE, editable=False
-    )
+class TenantModel(TenantAwareAbstract):
+    tenant = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
 
     objects = TenantManager()
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs):
-        if not self.tenant_id:
-            self.tenant = get_current_tenant()
-
-        super().save(*args, **kwargs)
 
 
 class CategoryQuerySet(models.QuerySet):

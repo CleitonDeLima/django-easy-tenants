@@ -1,10 +1,9 @@
-from django import forms
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from example.app_test.models import Customer, Product
+from example.app_test.models import Category, Customer, Product
 
 
 def tenant_not_required(view_func):
@@ -16,21 +15,11 @@ def tenant_not_required(view_func):
 
 
 @login_required
-def home(request):
-    html = (
-        "<h1>Home page</h1>"
-        '<a href="/admin/">admin</a> <br/>'
-        '<a href="/product/new/">new product</a>'
-    )
-    return HttpResponse(html)
-
-
-@login_required
 @tenant_not_required
 def customer_list(request):
     """List all customer/tenants"""
     customers = Customer.objects.all()
-    return render(request, "customer_list.html", {"object_list": customers})
+    return render(request, "customer_list.html", {"customer_list": customers})
 
 
 @login_required
@@ -43,18 +32,14 @@ def set_tenant(request, pk):
     tenant = get_object_or_404(Customer, pk=pk)
     request.session["tenant_id"] = str(tenant.id)
 
-    return redirect("home")
+    return redirect("product-list")
 
 
-## products
+CategoryForm = modelform_factory(Category, fields=["name"])
+ProductForm = modelform_factory(Product, fields=["name", "category"])
 
 
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ["name", "category"]
-
-
+@login_required
 def product_create(request):
     form = ProductForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -65,6 +50,24 @@ def product_create(request):
     return render(request, "product_form.html", context)
 
 
+@login_required
 def product_list(request):
-    context = {"object_list": Product.objects.all()}
+    context = {"product_list": Product.objects.all()}
     return render(request, "product_list.html", context)
+
+
+@login_required
+def category_create(request):
+    form = CategoryForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("category-list")
+
+    context = {"form": form}
+    return render(request, "category_form.html", context)
+
+
+@login_required
+def category_list(request):
+    context = {"category_list": Category.objects.all()}
+    return render(request, "category_list.html", context)

@@ -3,17 +3,19 @@ from django.contrib import admin
 from django.urls import include, path
 
 from example.app_test.views import (
+    category_create,
+    category_list,
     customer_list,
-    home,
     product_create,
     product_list,
     set_tenant,
 )
 
 urlpatterns = [
-    path("", home, name="home"),
-    path("customers/", customer_list, name="customer-list"),
+    path("", customer_list, name="customer-list"),
     path("set-tenant/<str:pk>/", set_tenant, name="set-tenant"),
+    path("category/new/", category_create, name="category-create"),
+    path("category/list/", category_list, name="category-list"),
     path("product/new/", product_create, name="product-create"),
     path("product/list/", product_list, name="product-list"),
     path("admin/", admin.site.urls),

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example</title>
+</head>
+<body>
+  {% if request.tenant %}
+    <p>In {{ request.tenant.name }}</p>
+  {% endif %}
+
+  <h1>Menu</h1>
+  <ul>
+    <li><a href="{% url 'admin:index' %}">Admin</a></li>
+    <li><a href="{% url 'customer-list' %}">Customers</a></li>
+    <hr>
+    <li><a href="{% url 'category-list' %}">Categories</a></li>
+    <li><a href="{% url 'product-list' %}">Products</a></li>
+  </ul>
+
+  {% block body %}
+  {% endblock %}
+</body>
+</html>
