@@ -51,8 +51,8 @@ class TenantAwareAbstract(models.Model):
 
     def save(self, *args, **kwargs):
         """Set tenant field on save"""
-        if getattr(self, field_name) is None:
-            setattr(self, field_name, get_current_tenant())
+
+        setattr(self, field_name, get_current_tenant())
 
         super().save(*args, **kwargs)
 
