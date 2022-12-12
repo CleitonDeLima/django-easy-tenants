@@ -34,7 +34,7 @@ tox = "^3.25.1"
 tox-gh-actions = "^2.9.1"
 django = ">=3.2"
 django-environ = "^0.9.0"
-black = "^22.8"
+black = "^22.12"
 isort = "^5.8.0"
 flake8 = "^5.0.4"
 
