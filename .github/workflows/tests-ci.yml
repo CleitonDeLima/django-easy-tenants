@@ -3,18 +3,31 @@ name: Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
+
+env:
+  POETRY_VERSION: 1.5.1
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-        database: [sqlite, postgres]
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+        django-version:
+          - "3.2"
+          - "4.1"
+          - "4.2"
+        database:
+          - "sqlite"
+          - "postgres"
     steps:
       - uses: actions/checkout@v3
       - uses: harmon758/postgresql-action@v1
@@ -24,22 +37,28 @@ jobs:
           postgresql user: "postgres"
           postgresql password: "postgres"
         if: matrix.database == 'postgres'
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: Install poetry
+        run: pipx install poetry==$POETRY_VERSION
+
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+
       - name: Install dependencies
         run: |
-          pip install tox tox-gh-actions
-      - name: Test ${{ matrix.python-version }}
+          poetry install
+          pip install "Django==${{ matrix.django-version }}.*"
+
+      - name: Test python ${{ matrix.python-version }} django ${{ matrix.django-version }} database ${{ matrix.database }}
         env:
           DATABASE: ${{ matrix.database }}
         run: |
-          tox
+          poetry run pytest -vv --migrations --cov=easy_tenants --cov-report=xml --cov-report=term-missing
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          flags: ${{ matrix.database }}, py${{ matrix.python-version }}
+          flags: ${{ matrix.database }}, py${{ matrix.python-version }}, django-${{ matrix.django-version }}
           name: tests
