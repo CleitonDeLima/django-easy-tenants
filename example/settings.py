@@ -131,3 +131,4 @@ INTERNAL_IPS = [
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 EASY_TENANTS_TENANT_FIELD = "tenant"
+EASY_TENANTS_TENANT_MODEL = "app_test.Customer"

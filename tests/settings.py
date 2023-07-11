@@ -46,3 +46,4 @@ MEDIA_URL = "/media/"
 STATIC_URL = "/static/"
 
 EASY_TENANTS_TENANT_FIELD = "store"
+EASY_TENANTS_TENANT_MODEL = "tests.StoreTenant"
