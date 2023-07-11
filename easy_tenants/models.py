@@ -34,13 +34,13 @@ class TenantManager(models.Manager):
 
         return queryset.filter(**filter_kwargs)
 
-    def bulk_create(self, objs):
+    def bulk_create(self, objs, *args, **kwargs):
         tenant = get_current_tenant()
 
         for obj in objs:
             setattr(obj, field_name, tenant)
 
-        return super().bulk_create(objs)
+        return super().bulk_create(objs, *args, **kwargs)
 
 
 class TenantAwareAbstract(models.Model):
