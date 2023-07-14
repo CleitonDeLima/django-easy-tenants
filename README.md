@@ -70,6 +70,11 @@ class Customer(models.Model):
     ...
 ```
 
+`settings.py`
+```python
+EASY_TENANTS_TENANT_MODEL = "yourapp.Customer"
+```
+
 Your models, which must have isolated data per tenant, we need to add the foreign field from the Customer model.
 and objects need to be replaced with `TenantManager()`.
 
