@@ -1,17 +1,19 @@
-import threading
 from contextlib import contextmanager
+from contextvars import ContextVar
 
 from easy_tenants.exceptions import TenantError
 
-state_local = threading.local()
+state_local = ContextVar(
+    "tenant-state",
+    default={
+        "enabled": True,
+        "tenant": None,
+    },
+)
 
 
 def get_state():
-    state_default = {
-        "enabled": True,
-        "tenant": None,
-    }
-    state = getattr(state_local, "state", state_default)
+    state = state_local.get()
     return state
 
 
@@ -32,12 +34,12 @@ def tenant_context(tenant=None, enabled=True):
     new_state["enabled"] = enabled
     new_state["tenant"] = tenant
 
-    state_local.state = new_state
+    state_local.set(new_state)
 
     try:
         yield
     finally:
-        state_local.state = previous_state
+        state_local.set(previous_state)
 
 
 @contextmanager
