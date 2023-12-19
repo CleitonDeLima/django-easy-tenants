@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-easy-tenants"
-version = "0.8.0"
+version = "0.9.0"
 description = "Easy to create applications that use tenants in django"
 authors = ["Cleiton Lima <cleiton.limapin@gmail.com>"]
 license = "MIT"
@@ -17,9 +17,7 @@ classifiers = [
     'Programming Language :: Python :: 3',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 ]
-packages = [
-    {include = "easy_tenants"}
-]
+packages = [{ include = "easy_tenants" }]
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -67,13 +65,8 @@ addopts = """\
     --strict-markers
     --ds=tests.settings
     """
-testpaths = [
-    "tests",
-]
-python_files = [
-    "tests.py",
-    "test_*.py",
-]
+testpaths = ["tests"]
+python_files = ["tests.py", "test_*.py"]
 
 [build-system]
 requires = ["poetry>=0.12"]
