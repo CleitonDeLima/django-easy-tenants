@@ -7,13 +7,16 @@ BASE_DIR = Path(__file__).parent
 
 env = environ.Env(DATABASE=(str, "sqlite"))
 
-envfile = BASE_DIR / "configs" / f'{env("DATABASE")}.env'
-environ.Env.read_env(str(envfile))
+if env("DATABASE") == "postgres":
+    db_url = "postgres://postgres:postgres@localhost:5432/easy_tenants"
+else:
+    db_url = "sqlite://:memory:"
+
 
 SECRET_KEY = "any-key"
 ROOT_URLCONF = "tests.urls"
 
-DATABASES = {"default": env.db()}
+DATABASES = {"default": environ.Env.db_url_config(db_url)}
 
 MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
