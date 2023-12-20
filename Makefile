@@ -1,2 +1,6 @@
 test:
-	pytest -s -vv --no-migrations --cov=easy_tenants --cov-report=xml --cov-report=term-missing
+	python -m pytest
+
+install:
+	poetry install
+	pip install -r tests/requirements.txt
