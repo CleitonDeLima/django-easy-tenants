@@ -52,6 +52,23 @@ def test_bulk_create(tenant_ctx):
     assert objs[1].get_tenant_instance() == tenant
 
 
+@pytest.mark.django_db
+def test_bulk_create_without_context():
+    store1 = StoreTenant.objects.create()
+    store2 = StoreTenant.objects.create()
+
+    objs = [
+        Product(name="prod1", store=store1),
+        Product(name="prod2", store=store2),
+    ]
+    with tenant_context_disabled():
+        objs = Product.objects.bulk_create(objs)
+
+        assert Product.objects.count() == 2
+        assert objs[0].get_tenant_instance() == store1
+        assert objs[1].get_tenant_instance() == store2
+
+
 def test_all_objects(db):
     store1 = StoreTenant.objects.create()
     store2 = StoreTenant.objects.create()

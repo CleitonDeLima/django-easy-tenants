@@ -37,8 +37,9 @@ class TenantManager(models.Manager):
     def bulk_create(self, objs, *args, **kwargs):
         tenant = get_current_tenant()
 
-        for obj in objs:
-            setattr(obj, field_name, tenant)
+        if tenant:
+            for obj in objs:
+                setattr(obj, field_name, tenant)
 
         return super().bulk_create(objs, *args, **kwargs)
 
