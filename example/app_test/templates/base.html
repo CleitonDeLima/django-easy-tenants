@@ -11,14 +11,16 @@
     <p>In {{ request.tenant.name }}</p>
   {% endif %}
 
-  <h1>Menu</h1>
-  <ul>
-    <li><a href="{% url 'admin:index' %}">Admin</a></li>
-    <li><a href="{% url 'customer-list' %}">Customers</a></li>
-    <hr>
-    <li><a href="{% url 'category-list' %}">Categories</a></li>
-    <li><a href="{% url 'product-list' %}">Products</a></li>
-  </ul>
+  {% if request.tenant %}
+    <h1>Menu</h1>
+    <ul>
+      <li><a href="{% url 'admin:index' %}">Admin</a></li>
+      <li><a href="{% url 'customer-list' %}">Customers</a></li>
+      <hr>
+      <li><a href="{% url 'category-list' %}">Categories</a></li>
+      <li><a href="{% url 'product-list' %}">Products</a></li>
+    </ul>
+  {% endif %}
 
   {% block body %}
   {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.forms.models import modelform_factory
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.views.decorators.http import require_POST
 
 from example.app_test.models import Category, Customer, Product
@@ -30,9 +30,8 @@ def set_tenant(request, pk):
     Save tenant in session
     """
     tenant = get_object_or_404(Customer, pk=pk)
-    request.session["tenant_id"] = str(tenant.id)
-
-    return redirect("product-list")
+    url = f"/{tenant.id}/"
+    return redirect(url)
 
 
 CategoryForm = modelform_factory(Category, fields=["name"])
@@ -71,3 +70,8 @@ def category_create(request):
 def category_list(request):
     context = {"category_list": Category.objects.all()}
     return render(request, "category_list.html", context)
+
+
+@login_required
+def home(request):
+    return render(request, "home.html")
