@@ -1,6 +1,3 @@
-test:
-	python -m pytest
-
 install:
-	poetry install
-	pip install -r tests/requirements.txt
+	uv tool install tox --with tox-uv
+	pre-commit install

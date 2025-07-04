@@ -1,0 +1,29 @@
+ci:
+  autoupdate_schedule: monthly
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: snapshots
+        types: [python, javascript, html, css]
+      - id: end-of-file-fixer
+        types: [python, javascript]
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.13
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
+
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.23.1
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "5.1"]

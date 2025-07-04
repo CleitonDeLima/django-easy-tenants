@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from django.views.generic import ListView
 
 from easy_tenants import tenant_not_required
-
 from tests.models import Contact
 
 

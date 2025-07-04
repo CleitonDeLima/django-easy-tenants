@@ -74,17 +74,16 @@ def test_all_objects(db):
     store2 = StoreTenant.objects.create()
     with tenant_context(store1):
         Product.objects.create(name="prod1")
-        Product.objects.count() == 1
+        assert Product.objects.count() == 1
 
     with tenant_context(store2):
         Product.objects.create(name="prod2")
-        Product.objects.count() == 1
+        assert Product.objects.count() == 1
 
     with tenant_context_disabled():
         assert Product.objects.count() == 2
 
 
 def test_tenant_required_error(db):
-    with pytest.raises(TenantError):
-        with tenant_context():
-            Product.objects.create(name="prod1")
+    with pytest.raises(TenantError), tenant_context():
+        Product.objects.create(name="prod1")

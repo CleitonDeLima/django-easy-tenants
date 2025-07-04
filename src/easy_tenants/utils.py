@@ -3,18 +3,14 @@ from contextvars import ContextVar
 
 from easy_tenants.exceptions import TenantError
 
-state_local = ContextVar(
-    "tenant-state",
-    default={
-        "enabled": True,
-        "tenant": None,
-    },
-)
+state = ContextVar("tenant-state", default=None)
+
+if state.get() is None:
+    state.set({"enabled": True, "tenant": None})
 
 
 def get_state():
-    state = state_local.get()
-    return state
+    return state.get()
 
 
 def get_current_tenant():
@@ -34,12 +30,12 @@ def tenant_context(tenant=None, enabled=True):
     new_state["enabled"] = enabled
     new_state["tenant"] = tenant
 
-    state_local.set(new_state)
+    state.set(new_state)
 
     try:
         yield
     finally:
-        state_local.set(previous_state)
+        state.set(previous_state)
 
 
 @contextmanager
