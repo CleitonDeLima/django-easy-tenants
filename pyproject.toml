@@ -1,13 +1,16 @@
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=77",
+]
+
 
 [project]
 name = "django-easy-tenants"
 description = "Easy to create applications that use tenants in django"
 version = "0.9.2"
 authors = [
-    { name = "Cleiton Lima", email = "<cleiton.limapin@gmail.com>"},
+    { name = "Cleiton Lima", email = "cleiton.limapin@gmail.com" },
 ]
 license = "MIT"
 readme = "README.md"
@@ -22,7 +25,6 @@ classifiers = [
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
@@ -32,17 +34,18 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
+urls.Repository = "https://github.com/CleitonDeLima/django-easy-tenants"
+urls.Homepage = "https://github.com/CleitonDeLima/django-easy-tenants"
 
-[tool.poetry]
-requires-poetry = ">=2.0"
-packages = [
-    { include = "easy_tenants" }
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-env",
+    "pytest-cov",
+    "pytest-django",
+    "psycopg2-binary",
+    "django-environ",
 ]
-
-[project.urls]
-Repository = "https://github.com/CleitonDeLima/django-easy-tenants"
-Homepage = "https://github.com/CleitonDeLima/django-easy-tenants"
-
 
 [tool.black]
 line-length = 80
@@ -69,11 +72,29 @@ include_trailing_comma = true
 skip = "migrations"
 
 [tool.pytest.ini_options]
-env = ["DJANGO_SETTINGS_MODULE=tests.settings"]
 minversion = "6.0"
 addopts = """\
     --strict-config
     --strict-markers
+    --ds=tests.settings
+    --cov-report=xml
     """
+django_find_project = false
+xfail_strict = true
 testpaths = ["tests"]
 python_files = ["tests.py", "test_*.py"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src"]
+
+[tool.coverage.report]
+show_missing = true
+source = ["src"]
+
+[tool.coverage.paths]
+source = [
+  "src",
+  ".tox/**/site-packages",
+]

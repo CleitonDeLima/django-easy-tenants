@@ -1,6 +1,0 @@
-pytest
-pytest-env
-pytest-cov
-pytest-django
-psycopg2-binary
-django-environ
