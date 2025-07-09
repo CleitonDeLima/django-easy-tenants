@@ -4,7 +4,6 @@ requires = [
   "setuptools>=77",
 ]
 
-
 [project]
 name = "django-easy-tenants"
 description = "Easy to create applications that use tenants in django"
@@ -14,16 +13,17 @@ authors = [
 ]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "django-appconf==1.0.4",
-    "django>=3.2"
+    "django>=4.2",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",

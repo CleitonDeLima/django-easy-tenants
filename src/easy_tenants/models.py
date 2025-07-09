@@ -1,11 +1,13 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import BaseExpression
 
 from easy_tenants import get_current_tenant
 from easy_tenants.conf import settings
 from easy_tenants.utils import get_state
 
-field_name = settings.EASY_TENANTS_TENANT_FIELD
+tenant_field_name = settings.EASY_TENANTS_TENANT_FIELD
 
 
 class CurrentTenant(BaseExpression):
@@ -29,8 +31,8 @@ class TenantManager(models.Manager):
         if not state.get("enabled", True):
             return queryset
 
-        field = getattr(self.model, field_name).field.target_field
-        filter_kwargs = {field_name: CurrentTenant(output_field=field)}
+        field = getattr(self.model, tenant_field_name).field.target_field
+        filter_kwargs = {tenant_field_name: CurrentTenant(output_field=field)}
 
         return queryset.filter(**filter_kwargs)
 
@@ -39,7 +41,7 @@ class TenantManager(models.Manager):
 
         if tenant:
             for obj in objs:
-                setattr(obj, field_name, tenant)
+                setattr(obj, tenant_field_name, tenant)
 
         return super().bulk_create(objs, *args, **kwargs)
 
@@ -52,10 +54,36 @@ class TenantAwareAbstract(models.Model):
 
     def save(self, *args, **kwargs):
         """Set tenant field on save"""
-        setattr(self, field_name, get_current_tenant())
+        setattr(self, tenant_field_name, get_current_tenant())
 
         super().save(*args, **kwargs)
 
     def get_tenant_instance(self):
         """Returns the model's tenant instance"""
-        return getattr(self, field_name)
+        return getattr(self, tenant_field_name)
+
+
+class UniqueTenantConstraint(UniqueConstraint):
+    def validate(self, model, instance, *args, **kwargs):
+        default_fields = self.fields
+
+        if tenant_field_name not in default_fields:
+            self.fields = list(default_fields) + [tenant_field_name]
+
+        setattr(instance, tenant_field_name, get_current_tenant())
+
+        try:
+            super().validate(model, instance, *args, **kwargs)
+        except ValidationError as e:
+            message_fields = [
+                field for field in default_fields if field != tenant_field_name
+            ]
+            use_default_message = (
+                self.violation_error_message
+                == self.default_violation_error_message
+            )
+            if use_default_message:
+                error = instance.unique_error_message(model, message_fields)
+                self.violation_error_message = error.message % error.params
+
+            raise ValidationError(self.violation_error_message) from e
