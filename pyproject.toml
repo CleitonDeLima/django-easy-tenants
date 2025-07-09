@@ -15,7 +15,7 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "django-appconf==1.0.4",
+    "django-appconf==1.1.0",
     "django>=4.2",
 ]
 classifiers = [
