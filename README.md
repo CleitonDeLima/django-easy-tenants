@@ -152,6 +152,45 @@ configuration (only available for local files).
 DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
 ```
 
+## UniqueTenantConstraint
+`UniqueTenantConstraint` is a custom Django constraint that ensures uniqueness of fields within the context of the current tenant. This is especially useful for multi-tenant applications, where you want to allow the same values to exist across different tenants, but enforce uniqueness within each tenant.
+
+### How it works
+This constraint automatically adds the tenant field to the list of fields being checked for uniqueness. That means, for example, two tenants can have products with the same name and SKU, but a single tenant cannot have duplicate products with the same name and SKU.
+
+### Usage Example
+Suppose you have a `Product` model and a `Tenant` model. You want to make sure that each product's `name` and `sku` combination is unique per tenant.
+
+```python
+from django.db import models
+
+from easy_tenants.models import TenantAwareAbstract, TenantManager, UniqueTenantConstraint
+
+
+class Product(TenantAwareAbstract):
+    name = models.CharField(max_length=100)
+    sku = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    objects = TenantManager()
+
+    class Meta:
+        constraints = [
+            UniqueTenantConstraint(
+                fields=["name", "sku"],
+                name="unique_product_name_sku_per_tenant"
+            )
+        ]
+```
+
+With this constraint, the following is possible:
+- Tenant A can have a product with name "Shirt" and SKU "123".
+- Tenant B can also have a product with name "Shirt" and SKU "123".
+- But Tenant A cannot have two products with the same name "Shirt" and SKU "123".
+
+### Notes
+- The tenant field is automatically added to the uniqueness check, so you don't need to include it in the `fields` list.
+- If the uniqueness constraint is violated within a tenant, a `ValidationError` will be raised.
 
 ## Running the example project
 ```bash

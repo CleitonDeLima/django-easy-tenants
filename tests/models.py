@@ -1,8 +1,13 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
 
-from easy_tenants.models import TenantAwareAbstract, TenantManager
+from easy_tenants.models import (
+    TenantAwareAbstract,
+    TenantManager,
+    UniqueTenantConstraint,
+)
 
 
 class ContactQuery(models.QuerySet):
@@ -46,3 +51,20 @@ class Contact(TenantModel):
     name = models.CharField(max_length=10)
 
     objects = TenantManager.from_queryset(ContactQuery)()
+
+
+class Order(TenantModel):
+    product = models.ForeignKey("tests.Product", on_delete=models.CASCADE)
+    code = models.CharField(max_length=10)
+    sku = models.CharField(max_length=4, blank=True)
+
+    class Meta:
+        constraints = [
+            UniqueTenantConstraint(fields=["code"], name="unique_code_store"),
+            UniqueTenantConstraint(
+                fields=["sku"],
+                condition=~Q(sku=""),
+                name="unique_sku_store",
+                violation_error_message="Sku exists!",
+            ),
+        ]
