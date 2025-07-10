@@ -1,13 +1,13 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import BaseExpression
 
 from easy_tenants import get_current_tenant
-from easy_tenants.conf import settings
 from easy_tenants.utils import get_state
 
-tenant_field_name = settings.EASY_TENANTS_TENANT_FIELD
+tenant_field_name = getattr(settings, "EASY_TENANTS_TENANT_FIELD", "tenant")
 
 
 class CurrentTenant(BaseExpression):
