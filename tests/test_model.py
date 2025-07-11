@@ -105,7 +105,7 @@ class TestUniqueTenantConstraint:
                 "Order with this Code already exists."
             ]
 
-    def test_custom_params(self):
+    def test_custom_params(self, settings):
         store = StoreTenant.objects.create()
         with tenant_context(store):
             product = Product.objects.create(name="prod")
@@ -114,6 +114,6 @@ class TestUniqueTenantConstraint:
             o = Order(product=product, code="3", sku="SUV")
 
             with pytest.raises(ValidationError) as exc_info:
-                o.full_clean()
+                o.full_clean(exclude=[settings.EASY_TENANTS_TENANT_FIELD])
 
             assert exc_info.value.messages == ["Sku exists!"]

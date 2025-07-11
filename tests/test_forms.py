@@ -1,7 +1,7 @@
 from django import forms
 
 from easy_tenants import tenant_context
-from tests.models import Category, Product, StoreTenant
+from tests.models import Category, Order, Product, StoreTenant
 
 
 def test_modelfield_contents(tenant_ctx):
@@ -40,3 +40,21 @@ def test_related_field_contents(tenant_ctx):
     assert f'<option value="{c1.id}">{c1.name}</option>' in form_template
     assert f'<option value="{c2.id}">{c2.name}</option>' in form_template
     assert "cat3" not in form_template
+
+
+def test_unique_tenant_contraint_validation(tenant_ctx):
+    class OrderForm(forms.ModelForm):
+        class Meta:
+            model = Order
+            fields = ["product", "code", "sku"]
+
+    prod = Product.objects.create(name="prod1")
+    Order.objects.create(product=prod, code="1", sku="FOO")
+    form = OrderForm(
+        {
+            "product": prod,
+            "code": "1",
+            "sku": "",
+        }
+    )
+    assert "Order with this Code already exists." in form.errors["__all__"]

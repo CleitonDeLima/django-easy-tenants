@@ -64,25 +64,32 @@ class TenantAwareAbstract(models.Model):
 
 
 class UniqueTenantConstraint(UniqueConstraint):
-    def validate(self, model, instance, *args, **kwargs):
+    def validate(self, model, instance, exclude=None, *args, **kwargs):
         default_fields = self.fields
 
+        # add tenant on fields
         if tenant_field_name not in default_fields:
             self.fields = list(default_fields) + [tenant_field_name]
+
+        # remove tenant on exclude
+        if exclude and tenant_field_name in exclude:
+            exclude = [field for field in exclude if field != tenant_field_name]
 
         setattr(instance, tenant_field_name, get_current_tenant())
 
         try:
-            super().validate(model, instance, *args, **kwargs)
+            super().validate(model, instance, exclude, *args, **kwargs)
         except ValidationError as e:
-            message_fields = [
-                field for field in default_fields if field != tenant_field_name
-            ]
             use_default_message = (
                 self.violation_error_message
                 == self.default_violation_error_message
             )
             if use_default_message:
+                message_fields = [
+                    field
+                    for field in default_fields
+                    if field != tenant_field_name
+                ]
                 error = instance.unique_error_message(model, message_fields)
                 self.violation_error_message = error.message % error.params
 

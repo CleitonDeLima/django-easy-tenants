@@ -5,12 +5,9 @@ from easy_tenants.exceptions import TenantError
 
 state = ContextVar("tenant-state", default=None)
 
-if state.get() is None:
-    state.set({"enabled": True, "tenant": None})
-
 
 def get_state():
-    return state.get()
+    return state.get() or {"enabled": True, "tenant": None}
 
 
 def get_current_tenant():
