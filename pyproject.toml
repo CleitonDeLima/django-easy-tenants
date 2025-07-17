@@ -7,7 +7,7 @@ requires = [
 [project]
 name = "django-easy-tenants"
 description = "Easy to create applications that use tenants in django"
-version = "0.9.5"
+version = "0.9.6"
 authors = [
     { name = "Cleiton Lima", email = "cleiton.limapin@gmail.com" },
 ]
