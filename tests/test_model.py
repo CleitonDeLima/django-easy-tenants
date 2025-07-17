@@ -1,5 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
+from django.db.models import UniqueConstraint
+from django.db.utils import IntegrityError
 
 from easy_tenants import (
     get_current_tenant,
@@ -7,6 +9,7 @@ from easy_tenants import (
     tenant_context_disabled,
 )
 from easy_tenants.exceptions import TenantError
+from easy_tenants.models import UniqueTenantConstraint
 from tests.models import Contact, Order, Product, StoreTenant
 
 
@@ -92,6 +95,21 @@ def test_tenant_required_error(db):
 
 @pytest.mark.django_db
 class TestUniqueTenantConstraint:
+    def test_constraint(self, settings):
+        c1 = UniqueTenantConstraint(fields=["code"], name="test_constraint")
+        c2 = UniqueTenantConstraint(
+            fields=[settings.EASY_TENANTS_TENANT_FIELD, "code"],
+            name="test_constraint",
+        )
+        c3 = UniqueConstraint(
+            fields=[settings.EASY_TENANTS_TENANT_FIELD, "code"],
+            name="test_constraint",
+        )
+
+        assert c1.fields == (settings.EASY_TENANTS_TENANT_FIELD, "code")
+        assert c2.fields == (settings.EASY_TENANTS_TENANT_FIELD, "code")
+        assert c1 == c2 == c3
+
     def test_unique_validate(self):
         store = StoreTenant.objects.create()
         with tenant_context(store):
@@ -105,7 +123,7 @@ class TestUniqueTenantConstraint:
                 "Order with this Code already exists."
             ]
 
-    def test_custom_params(self, settings):
+    def test_validate_with_custom_params(self, settings):
         store = StoreTenant.objects.create()
         with tenant_context(store):
             product = Product.objects.create(name="prod")
@@ -117,3 +135,17 @@ class TestUniqueTenantConstraint:
                 o.full_clean(exclude=[settings.EASY_TENANTS_TENANT_FIELD])
 
             assert exc_info.value.messages == ["Sku exists!"]
+
+    def test_save(self):
+        store1 = StoreTenant.objects.create()
+        store2 = StoreTenant.objects.create()
+        code = "1"
+
+        with tenant_context(store1):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code=code)
+
+        with pytest.raises(IntegrityError), tenant_context(store2):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code=code)
+            Order.objects.create(product=product, code=code)
