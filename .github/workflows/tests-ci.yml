@@ -23,7 +23,7 @@ jobs:
           - "sqlite"
           - "postgres"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: harmon758/postgresql-action@v1
         with:
           postgresql version: 16
