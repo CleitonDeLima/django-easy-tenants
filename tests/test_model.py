@@ -93,6 +93,51 @@ def test_tenant_required_error(db):
         Product.objects.create(name="prod1")
 
 
+def test_update_preserves_original_tenant_in_other_context(db):
+    store1 = StoreTenant.objects.create()
+    store2 = StoreTenant.objects.create()
+
+    with tenant_context(store1):
+        product = Product.objects.create(name="prod1")
+
+    with tenant_context_disabled():
+        product = Product.objects.get(pk=product.pk)
+
+    with tenant_context(store2):
+        product.name = "renamed"
+        product.save()
+
+    with tenant_context_disabled():
+        product.refresh_from_db()
+        assert product.get_tenant_instance() == store1
+
+
+def test_update_inside_disabled_context_keeps_tenant(db):
+    store1 = StoreTenant.objects.create()
+
+    with tenant_context(store1):
+        product = Product.objects.create(name="prod1")
+
+    with tenant_context_disabled():
+        product.name = "renamed"
+        product.save()
+        product.refresh_from_db()
+
+        assert product.get_tenant_instance() == store1
+        assert product.name == "renamed"
+
+
+def test_create_inside_disabled_respects_pre_assigned_tenant(db):
+    store1 = StoreTenant.objects.create()
+
+    with tenant_context_disabled():
+        product = Product(name="prod1", store=store1)
+        product.save()
+        product.refresh_from_db()
+
+        assert product.get_tenant_instance() == store1
+
+
 @pytest.mark.django_db
 class TestUniqueTenantConstraint:
     def test_constraint(self, settings):
