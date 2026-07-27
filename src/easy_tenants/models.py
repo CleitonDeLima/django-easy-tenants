@@ -53,8 +53,11 @@ class TenantAwareAbstract(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        """Set tenant field on save"""
-        setattr(self, tenant_field_name, get_current_tenant())
+        """Set tenant field on create only; preserve it on updates."""
+        if self._state.adding:
+            tenant = get_current_tenant()
+            if tenant is not None:
+                setattr(self, tenant_field_name, tenant)
 
         super().save(*args, **kwargs)
 
