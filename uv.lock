@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.10'",
@@ -142,7 +142,7 @@ wheels = [
 
 [[package]]
 name = "django-easy-tenants"
-version = "0.9.6"
+version = "0.9.7"
 source = { editable = "." }
 dependencies = [
     { name = "django", version = "4.2.23", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
