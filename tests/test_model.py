@@ -1,7 +1,8 @@
 import pytest
 from django.core.exceptions import ValidationError
-from django.db.models import UniqueConstraint
+from django.db.models import F, UniqueConstraint
 from django.db.utils import IntegrityError
+from django.utils import translation
 
 from easy_tenants import (
     get_current_tenant,
@@ -10,7 +11,16 @@ from easy_tenants import (
 )
 from easy_tenants.exceptions import TenantError
 from easy_tenants.models import UniqueTenantConstraint
-from tests.models import Contact, Order, Product, StoreTenant
+from tests.models import (
+    Bin,
+    Category,
+    Contact,
+    Order,
+    Product,
+    Shelf,
+    StoreTenant,
+    Warehouse,
+)
 
 
 def test_create_object(tenant_ctx):
@@ -54,6 +64,13 @@ def test_bulk_create(tenant_ctx):
     assert Product.objects.count() == 2
     assert objs[0].get_tenant_instance() == tenant
     assert objs[1].get_tenant_instance() == tenant
+
+
+def test_bulk_create_from_generator(tenant_ctx):
+    objs = (Product(name=f"prod{i}") for i in range(2))
+    Product.objects.bulk_create(objs)
+
+    assert Product.objects.count() == 2
 
 
 @pytest.mark.django_db
@@ -138,6 +155,19 @@ def test_create_inside_disabled_respects_pre_assigned_tenant(db):
         assert product.get_tenant_instance() == store1
 
 
+@pytest.mark.parametrize("model", [Shelf, Bin])
+def test_tenant_without_id_field(db, model):
+    warehouse1 = Warehouse.objects.create(code="w1", slug="first")
+    warehouse2 = Warehouse.objects.create(code="w2", slug="second")
+
+    with tenant_context(warehouse1):
+        model.objects.create()
+        assert model.objects.count() == 1
+
+    with tenant_context(warehouse2):
+        assert model.objects.count() == 0
+
+
 @pytest.mark.django_db
 class TestUniqueTenantConstraint:
     def test_constraint(self, settings):
@@ -167,6 +197,39 @@ class TestUniqueTenantConstraint:
             assert exc_info.value.messages == [
                 "Order with this Code already exists."
             ]
+            [error] = exc_info.value.error_dict["__all__"]
+            assert error.code == "unique_together"
+
+    def test_unique_validate_message_is_translated(self):
+        store = StoreTenant.objects.create()
+        with tenant_context(store):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code="1")
+
+            messages = []
+            for language in ("en", "pt-br", "en"):
+                with translation.override(language):
+                    with pytest.raises(ValidationError) as exc_info:
+                        Order(product=product, code="1").full_clean()
+                    messages.append(exc_info.value.messages)
+
+            assert messages[0] == messages[2]
+            assert messages[0] != messages[1]
+
+    def test_validate_in_disabled_context_keeps_tenant(self):
+        store = StoreTenant.objects.create()
+        with tenant_context(store):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code="1")
+            order = Order.objects.create(product=product, code="2")
+
+        with tenant_context_disabled():
+            order = Order.objects.get(pk=order.pk)
+            order.code = "1"
+
+            with pytest.raises(ValidationError):
+                order.full_clean()
+            assert order.get_tenant_instance() == store
 
     def test_validate_with_custom_params(self, settings):
         store = StoreTenant.objects.create()
@@ -180,6 +243,45 @@ class TestUniqueTenantConstraint:
                 o.full_clean(exclude=[settings.EASY_TENANTS_TENANT_FIELD])
 
             assert exc_info.value.messages == ["Sku exists!"]
+            [error] = exc_info.value.error_dict["__all__"]
+            assert error.code == "sku_exists"
+
+    def test_validate_new_instance_in_disabled_context(self):
+        store = StoreTenant.objects.create()
+        with tenant_context(store):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code="1")
+
+        with tenant_context_disabled():
+            order = Order(product=product, code="1", store=store)
+
+            with pytest.raises(ValidationError):
+                order.full_clean()
+            assert order.get_tenant_instance() == store
+
+    def test_constraint_with_expressions(self, settings):
+        constraint = UniqueTenantConstraint(F("code"), name="test_constraint")
+
+        assert constraint.fields == ()
+        assert constraint.expressions == (
+            F(settings.EASY_TENANTS_TENANT_FIELD),
+            F("code"),
+        )
+
+    def test_validate_with_expressions(self):
+        store1 = StoreTenant.objects.create()
+        store2 = StoreTenant.objects.create()
+        with tenant_context(store1):
+            Category.objects.create(name="Cat")
+
+            with pytest.raises(ValidationError) as exc_info:
+                Category(name="cat").full_clean()
+            assert exc_info.value.messages == [
+                "Constraint “unique_name_store” is violated."
+            ]
+
+        with tenant_context(store2):
+            Category(name="cat").full_clean()
 
     def test_save(self):
         store1 = StoreTenant.objects.create()

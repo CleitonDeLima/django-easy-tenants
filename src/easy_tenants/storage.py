@@ -1,5 +1,4 @@
 import os
-from contextlib import suppress
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -14,18 +13,18 @@ class TenantFileSystemStorage(FileSystemStorage):
     """
 
     def get_relative_tenant_location(self):
-        with suppress(AttributeError):
-            tenant = get_current_tenant()
-            return os.path.join(settings.MEDIA_ROOT, str(tenant.id))
+        tenant = get_current_tenant()
+        if tenant is None:
+            return settings.MEDIA_ROOT
 
-        return settings.MEDIA_ROOT
+        return os.path.join(settings.MEDIA_ROOT, str(tenant.pk))
 
     def get_relative_tenant_url(self):
-        with suppress(AttributeError):
-            tenant = get_current_tenant()
-            return urljoin(settings.MEDIA_URL, str(tenant.id) + "/")
+        tenant = get_current_tenant()
+        if tenant is None:
+            return settings.MEDIA_URL
 
-        return settings.MEDIA_URL
+        return urljoin(settings.MEDIA_URL, str(tenant.pk) + "/")
 
     @property
     def base_location(self):  # Not cached like in parent class

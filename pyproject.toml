@@ -77,7 +77,6 @@ addopts = """\
     --strict-config
     --strict-markers
     --ds=tests.settings
-    --cov-report=xml
     """
 django_find_project = false
 xfail_strict = true
@@ -87,11 +86,10 @@ python_files = ["tests.py", "test_*.py"]
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["src"]
+source_pkgs = ["easy_tenants"]
 
 [tool.coverage.report]
 show_missing = true
-source = ["src"]
 
 [tool.coverage.paths]
 source = [

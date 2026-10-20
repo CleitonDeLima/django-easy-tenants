@@ -25,6 +25,7 @@ env/
 .coverage.*
 htmlcov/
 coverage.xml
+coverage/
 .ruff_cache/
 .mypy_cache/
 

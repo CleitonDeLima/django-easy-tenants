@@ -4,6 +4,19 @@
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
 - Dropped support for Python < 3.11 and Django < 5.2 (#138)
 - Added GitHub Actions workflow to publish the package to PyPI on release
+- Fixed `TenantManager.bulk_create()` creating nothing when given a generator (#140)
+- Added support for expressions in `UniqueTenantConstraint` (#140)
+- Fixed `UniqueTenantConstraint.validate()` overwriting the tenant of existing
+  instances (e.g. clearing it inside `tenant_context_disabled()`) (#140)
+- Fixed `UniqueTenantConstraint` dropping the error `code` and freezing the
+  default message in the language of the first violation (#140)
+- Fixed tenants whose primary key isn't named `id`, or that are referenced
+  through a `to_field`; `TenantFileSystemStorage` silently stored their files
+  in the shared `MEDIA_ROOT` (#140)
+- `shell_tenant` now raises a clear error when neither `--tenant_id` nor
+  `--disable` is given, or when the tenant doesn't exist (#140)
+- Fixed `shell_tenant` failing on every run with "Unknown option(s) for shell
+  command: skip_checks" (#140)
 
 ## [0.9.7] - (2026-07-27)
 - `TenantAwareAbstract.save()` now sets the tenant only on create and
