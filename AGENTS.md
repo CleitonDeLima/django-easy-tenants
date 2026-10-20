@@ -16,6 +16,7 @@ This library is distributed on PyPI and used by an international community, so *
 - **Commit messages**: English.
 - **Issues, pull requests, descriptions, titles and changelog**: English.
 - **Never commit without explicit authorization** from the maintainer. A request to create or change files is not a request to commit: leave the changes in the working tree and ask before committing. The same applies to pushing and opening pull requests.
+- **Pull request descriptions must be simple**: a few short sentences or bullets on what changed and why. No headers, test plans, checklists or file-by-file walkthroughs; the diff speaks for itself.
 - **Commit messages and pull requests must not mention AI assistants**: no `Co-Authored-By` trailer for an AI, no "Generated with ..." footer, no signature or reference to the assistant. Authorship belongs to the human maintainer.
 
 ## Commands
@@ -86,3 +87,14 @@ Two settings control everything:
 - New behavior should follow the same pattern: keep the public API in `src/easy_tenants/__init__.py` minimal (today it only re-exports `get_current_tenant`, `tenant_context`, `tenant_context_disabled`), and resolve the active tenant *as late as possible* — like `CurrentTenant`, which defers until SQL execution.
 - Always reference the tenant field via `tenant_field_name` (the module-level value read from settings); never hardcode `"tenant"`. The tests set `EASY_TENANTS_TENANT_FIELD = "store"` precisely to catch regressions here.
 - When changing the test matrix, update both `tox.ini` (envlist + Django pin per env) and `.github/workflows/tests-ci.yml` (Python matrix). The classifiers in `pyproject.toml` must also stay in sync.
+- Every PR that changes user-facing behavior (features, fixes, supported Python/Django versions) must add a line under `## [Unreleased]` in `CHANGELOG.md`, referencing the PR number.
+
+## Releasing
+
+Versions follow SemVer and are set statically in `pyproject.toml`; tags have no `v` prefix (e.g. `0.10.0`). While the project is on `0.x`, breaking changes (including dropping Python/Django versions) bump the minor version.
+
+1. Open a "Release X.Y.Z" PR containing only:
+   - the version bump, via `uv version --bump patch|minor|major` (updates both `pyproject.toml` and `uv.lock` — don't edit the version by hand);
+   - in `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - (YYYY-MM-DD)` and add a new empty `## [Unreleased]` above it.
+2. After merging, create a GitHub release on `main` with tag `X.Y.Z`, using the changelog section as release notes.
+3. Publishing the release triggers `.github/workflows/publish.yml`, which checks that the tag matches the `pyproject.toml` version, builds with `uv build` and uploads to PyPI via Trusted Publishing (OIDC, `pypi` environment — no API token). Never upload to PyPI manually.
