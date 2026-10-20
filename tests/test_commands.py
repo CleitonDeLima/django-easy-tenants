@@ -1,10 +1,11 @@
+import uuid
 from io import StringIO
 
 import pytest
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 
 from easy_tenants.management.commands import shell_tenant
-from tests.models import StoreTenant
+from tests.models import StoreTenant, Warehouse
 
 
 @pytest.mark.django_db
@@ -16,6 +17,30 @@ class TestShellTenant:
         cmd.tests_mode = True
 
         assert call_command(cmd, tenant_id=str(tenant.id)) == "shell"
+
+    def test_tenant_without_id_field(self, settings):
+        settings.EASY_TENANTS_TENANT_MODEL = "tests.Warehouse"
+        Warehouse.objects.create(code="w1", slug="first")
+
+        cmd = shell_tenant.Command()
+        cmd.tests_mode = True
+
+        assert call_command(cmd, tenant_id="w1") == "shell"
+
+    def test_missing_tenant_id(self):
+        cmd = shell_tenant.Command()
+        cmd.tests_mode = True
+
+        with pytest.raises(CommandError, match="--tenant_id or --disable"):
+            call_command(cmd)
+
+    @pytest.mark.parametrize("tenant_id", ["not-a-uuid", str(uuid.uuid4())])
+    def test_tenant_not_found(self, tenant_id):
+        cmd = shell_tenant.Command()
+        cmd.tests_mode = True
+
+        with pytest.raises(CommandError, match="not found"):
+            call_command(cmd, tenant_id=tenant_id)
 
     def test_override(self):
         stdout = StringIO()

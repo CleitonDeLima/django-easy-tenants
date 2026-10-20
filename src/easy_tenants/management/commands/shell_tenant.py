@@ -1,7 +1,8 @@
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from easy_tenants import tenant_context, tenant_context_disabled
 
@@ -43,8 +44,14 @@ class Command(BaseCommand):
                 )
                 return self.call_command(*args, **options)
 
+        if tenant_id is None:
+            raise CommandError("Specify --tenant_id or --disable.")
+
         TenantModel = apps.get_model(settings.EASY_TENANTS_TENANT_MODEL)
-        tenant = TenantModel.objects.get(id=tenant_id)
+        try:
+            tenant = TenantModel.objects.get(pk=tenant_id)
+        except (TenantModel.DoesNotExist, ValidationError, ValueError) as e:
+            raise CommandError(f"Tenant {tenant_id!r} not found.") from e
 
         with tenant_context(tenant):
             return self.call_command(*args, **options)

@@ -13,6 +13,8 @@
 - Fixed tenants whose primary key isn't named `id`, or that are referenced
   through a `to_field`; `TenantFileSystemStorage` silently stored their files
   in the shared `MEDIA_ROOT`
+- `shell_tenant` now raises a clear error when neither `--tenant_id` nor
+  `--disable` is given, or when the tenant doesn't exist
 
 ## [0.9.7] - (2026-07-27)
 - `TenantAwareAbstract.save()` now sets the tenant only on create and
