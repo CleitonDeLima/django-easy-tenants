@@ -1,9 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.10.0] - (2026-10-20)
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
 - Dropped support for Python < 3.11 and Django < 5.2 (#138)
-- Added GitHub Actions workflow to publish the package to PyPI on release
+- Added GitHub Actions workflow to publish the package to PyPI on release (#139)
 - Fixed `TenantManager.bulk_create()` creating nothing when given a generator (#140)
 - Added support for expressions in `UniqueTenantConstraint` (#140)
 - Fixed `UniqueTenantConstraint.validate()` overwriting the tenant of existing
