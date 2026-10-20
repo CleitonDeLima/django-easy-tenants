@@ -246,6 +246,19 @@ class TestUniqueTenantConstraint:
             [error] = exc_info.value.error_dict["__all__"]
             assert error.code == "sku_exists"
 
+    def test_validate_new_instance_in_disabled_context(self):
+        store = StoreTenant.objects.create()
+        with tenant_context(store):
+            product = Product.objects.create(name="prod")
+            Order.objects.create(product=product, code="1")
+
+        with tenant_context_disabled():
+            order = Order(product=product, code="1", store=store)
+
+            with pytest.raises(ValidationError):
+                order.full_clean()
+            assert order.get_tenant_instance() == store
+
     def test_constraint_with_expressions(self, settings):
         constraint = UniqueTenantConstraint(F("code"), name="test_constraint")
 
