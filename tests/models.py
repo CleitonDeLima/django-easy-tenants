@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Lower
 
 from easy_tenants.models import (
     TenantAwareAbstract,
@@ -43,6 +44,11 @@ class Product(TenantModel):
 class Category(TenantModel):
     name = models.CharField(max_length=10)
 
+    class Meta:
+        constraints = [
+            UniqueTenantConstraint(Lower("name"), name="unique_name_store"),
+        ]
+
     def __str__(self):
         return self.name
 
@@ -66,5 +72,6 @@ class Order(TenantModel):
                 condition=~Q(sku=""),
                 name="unique_sku_store",
                 violation_error_message="Sku exists!",
+                violation_error_code="sku_exists",
             ),
         ]

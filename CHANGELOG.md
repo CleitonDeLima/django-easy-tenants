@@ -4,6 +4,12 @@
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
 - Dropped support for Python < 3.11 and Django < 5.2 (#138)
 - Added GitHub Actions workflow to publish the package to PyPI on release
+- Fixed `TenantManager.bulk_create()` creating nothing when given a generator
+- Added support for expressions in `UniqueTenantConstraint`
+- Fixed `UniqueTenantConstraint.validate()` overwriting the tenant of existing
+  instances (e.g. clearing it inside `tenant_context_disabled()`)
+- Fixed `UniqueTenantConstraint` dropping the error `code` and freezing the
+  default message in the language of the first violation
 
 ## [0.9.7] - (2026-07-27)
 - `TenantAwareAbstract.save()` now sets the tenant only on create and

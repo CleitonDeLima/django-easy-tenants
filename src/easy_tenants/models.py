@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
-from django.db.models.expressions import BaseExpression
+from django.db.models.expressions import BaseExpression, F
 
 from easy_tenants import get_current_tenant
 from easy_tenants.utils import get_state
@@ -40,6 +40,7 @@ class TenantManager(models.Manager):
         tenant = get_current_tenant()
 
         if tenant:
+            objs = list(objs)
             for obj in objs:
                 setattr(obj, tenant_field_name, tenant)
 
@@ -68,7 +69,11 @@ class TenantAwareAbstract(models.Model):
 
 class UniqueTenantConstraint(UniqueConstraint):
     def __init__(self, *expressions, fields=(), **kwargs):
-        if tenant_field_name not in fields:
+        if expressions:
+            tenant_expression = F(tenant_field_name)
+            if tenant_expression not in expressions:
+                expressions = (tenant_expression, *expressions)
+        elif tenant_field_name not in fields:
             fields = (tenant_field_name,) + tuple(fields)
 
         super().__init__(*expressions, fields=fields, **kwargs)
@@ -77,18 +82,28 @@ class UniqueTenantConstraint(UniqueConstraint):
         if exclude and tenant_field_name in exclude:
             exclude = [field for field in exclude if field != tenant_field_name]
 
-        setattr(instance, tenant_field_name, get_current_tenant())
+        # Mirror TenantAwareAbstract.save(): the tenant is only stamped on
+        # create, so existing instances are validated against their own.
+        if instance._state.adding:
+            tenant = get_current_tenant()
+            if tenant is not None:
+                setattr(instance, tenant_field_name, tenant)
 
         try:
             super().validate(model, instance, exclude, *args, **kwargs)
         except ValidationError as e:
             use_default_message = (
-                self.violation_error_message
+                self.fields
+                and self.violation_error_message
                 == self.default_violation_error_message
             )
-            if use_default_message:
-                fields = set(self.fields) ^ {tenant_field_name}
-                error = instance.unique_error_message(model, list(fields))
-                self.violation_error_message = error.message % error.params
+            if not use_default_message:
+                raise
 
-            raise ValidationError(self.violation_error_message) from e
+            # Build the message per call (it must follow the active language)
+            # with only the user-visible fields.
+            fields = [f for f in self.fields if f != tenant_field_name]
+            error = instance.unique_error_message(model, fields)
+            raise ValidationError(
+                error.message, code=e.code, params=error.params
+            ) from e
