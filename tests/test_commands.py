@@ -18,6 +18,18 @@ class TestShellTenant:
 
         assert call_command(cmd, tenant_id=str(tenant.id)) == "shell"
 
+    def test_run_shell_in_tenant_context(self, capsys):
+        tenant = StoreTenant.objects.create()
+
+        call_command(
+            "shell_tenant",
+            tenant_id=str(tenant.id),
+            command="from easy_tenants import get_current_tenant; "
+            "print(get_current_tenant().pk)",
+        )
+
+        assert str(tenant.pk) in capsys.readouterr().out
+
     def test_tenant_without_id_field(self, settings):
         settings.EASY_TENANTS_TENANT_MODEL = "tests.Warehouse"
         Warehouse.objects.create(code="w1", slug="first")

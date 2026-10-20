@@ -60,4 +60,6 @@ class Command(BaseCommand):
         if self.tests_mode:
             return "shell"
 
+        # The shell command has no --skip-checks option and rejects it.
+        options.pop("skip_checks", None)
         return call_command(self.cmd, *args, **options)
