@@ -11,7 +11,16 @@ from easy_tenants import (
 )
 from easy_tenants.exceptions import TenantError
 from easy_tenants.models import UniqueTenantConstraint
-from tests.models import Category, Contact, Order, Product, StoreTenant
+from tests.models import (
+    Bin,
+    Category,
+    Contact,
+    Order,
+    Product,
+    Shelf,
+    StoreTenant,
+    Warehouse,
+)
 
 
 def test_create_object(tenant_ctx):
@@ -144,6 +153,19 @@ def test_create_inside_disabled_respects_pre_assigned_tenant(db):
         product.refresh_from_db()
 
         assert product.get_tenant_instance() == store1
+
+
+@pytest.mark.parametrize("model", [Shelf, Bin])
+def test_tenant_without_id_field(db, model):
+    warehouse1 = Warehouse.objects.create(code="w1", slug="first")
+    warehouse2 = Warehouse.objects.create(code="w2", slug="second")
+
+    with tenant_context(warehouse1):
+        model.objects.create()
+        assert model.objects.count() == 1
+
+    with tenant_context(warehouse2):
+        assert model.objects.count() == 0
 
 
 @pytest.mark.django_db

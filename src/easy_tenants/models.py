@@ -15,10 +15,11 @@ class CurrentTenant(BaseExpression):
 
     def as_sql(self, compiler, connection, *args, **kwargs):
         current_tenant = get_current_tenant()
-        tenant_id = str(current_tenant.id)
-        value = self.output_field.get_db_prep_value(tenant_id, connection)
+        # output_field is the FK target field (the pk, or its to_field).
+        value = getattr(current_tenant, self.output_field.attname)
+        value = self.output_field.get_db_prep_value(value, connection)
 
-        return "%s", [str(value)]
+        return "%s", [value]
 
 
 class TenantManager(models.Manager):

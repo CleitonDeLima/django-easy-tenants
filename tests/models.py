@@ -75,3 +75,24 @@ class Order(TenantModel):
                 violation_error_code="sku_exists",
             ),
         ]
+
+
+class Warehouse(models.Model):
+    """Tenant whose primary key is not named ``id``."""
+
+    code = models.CharField(primary_key=True, max_length=10)
+    slug = models.SlugField(unique=True)
+
+
+class Shelf(TenantAwareAbstract):
+    store = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+
+    objects = TenantManager()
+
+
+class Bin(TenantAwareAbstract):
+    store = models.ForeignKey(
+        Warehouse, to_field="slug", on_delete=models.CASCADE
+    )
+
+    objects = TenantManager()

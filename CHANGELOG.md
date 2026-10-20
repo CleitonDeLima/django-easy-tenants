@@ -10,6 +10,9 @@
   instances (e.g. clearing it inside `tenant_context_disabled()`)
 - Fixed `UniqueTenantConstraint` dropping the error `code` and freezing the
   default message in the language of the first violation
+- Fixed tenants whose primary key isn't named `id`, or that are referenced
+  through a `to_field`; `TenantFileSystemStorage` silently stored their files
+  in the shared `MEDIA_ROOT`
 
 ## [0.9.7] - (2026-07-27)
 - `TenantAwareAbstract.save()` now sets the tenant only on create and

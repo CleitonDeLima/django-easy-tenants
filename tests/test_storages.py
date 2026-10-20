@@ -1,7 +1,8 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from easy_tenants import tenant_context_disabled
+from easy_tenants import tenant_context, tenant_context_disabled
 from easy_tenants.storage import TenantFileSystemStorage
+from tests.models import Warehouse
 
 
 def test_default_storage(tenant_ctx, settings):
@@ -34,3 +35,11 @@ def test_custom_base_location(tenant_ctx, settings):
     assert s.exists("test.txt")
     assert s.path("test.txt") == f"{location}/test.txt"
     assert s.url("test.txt") == "custom_url/test.txt"
+
+
+def test_storage_with_tenant_without_id_field(settings):
+    with tenant_context(Warehouse(code="w1")):
+        s = TenantFileSystemStorage()
+
+        assert s.path("test.txt") == f"{settings.MEDIA_ROOT}/w1/test.txt"
+        assert s.url("test.txt") == f"{settings.MEDIA_URL}w1/test.txt"
