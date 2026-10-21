@@ -50,7 +50,7 @@ jobs:
         run: tox -f py$(echo ${{ matrix.python-version }} | tr -d .)
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./coverage
