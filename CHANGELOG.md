@@ -8,7 +8,7 @@
   `EASY_TENANTS_TENANT_MODEL`, tenant-aware models and the session
   middleware order (#150)
 - Fixed `tenant_context()` and `tenant_context_disabled()` silently not
-  applying when used as decorators on `async def` functions (#XXX)
+  applying when used as decorators on `async def` functions (#151)
 
 ## [0.10.0] - (2026-10-20)
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
