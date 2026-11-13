@@ -52,3 +52,8 @@ EASY_TENANTS_TENANT_FIELD = "store"
 EASY_TENANTS_TENANT_MODEL = "tests.StoreTenant"
 
 USE_TZ = True
+
+# tests.Shelf and tests.Bin use Warehouse as their tenant to cover tenants
+# whose primary key isn't ``id`` or that are referenced through a to_field,
+# so their FK doesn't point to EASY_TENANTS_TENANT_MODEL.
+SILENCED_SYSTEM_CHECKS = ["easy_tenants.E006"]
