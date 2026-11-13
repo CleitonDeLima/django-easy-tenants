@@ -1,4 +1,5 @@
 import pytest
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -67,6 +68,15 @@ def test_tenant_model_setting_unset_with_middleware(no_tenant_model):
 
 def test_project_tenant_models_pass():
     assert active(check_tenant_models()) == []
+
+
+def test_tenant_models_restricted_to_app_configs():
+    # tests.Shelf and tests.Bin point to Warehouse (E006, silenced in settings).
+    tests_errors = check_tenant_models([apps.get_app_config("tests")])
+    auth_errors = check_tenant_models([apps.get_app_config("auth")])
+
+    assert sorted(e.obj.__name__ for e in tests_errors) == ["Bin", "Shelf"]
+    assert auth_errors == []
 
 
 @isolate_apps("tests")
