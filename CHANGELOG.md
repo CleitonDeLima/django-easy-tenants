@@ -6,7 +6,7 @@
   tenant (#149)
 - Added system checks that report invalid easy-tenants configuration:
   `EASY_TENANTS_TENANT_MODEL`, tenant-aware models and the session
-  middleware order (#TBD)
+  middleware order (#150)
 
 ## [0.10.0] - (2026-10-20)
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
