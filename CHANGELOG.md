@@ -11,7 +11,7 @@
   applying when used as decorators on `async def` functions (#151)
 
 ## [0.10.0] - (2026-10-20)
-- Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
+- Added support for Django 6.0, 6.1 and Python 3.14, 3.15 (#138)
 - Dropped support for Python < 3.11 and Django < 5.2 (#138)
 - Added GitHub Actions workflow to publish the package to PyPI on release (#139)
 - Fixed `TenantManager.bulk_create()` creating nothing when given a generator (#140)
@@ -20,9 +20,9 @@
   instances (e.g. clearing it inside `tenant_context_disabled()`) (#140)
 - Fixed `UniqueTenantConstraint` dropping the error `code` and freezing the
   default message in the language of the first violation (#140)
-- Fixed tenants whose primary key isn't named `id`, or that are referenced
-  through a `to_field`; `TenantFileSystemStorage` silently stored their files
-  in the shared `MEDIA_ROOT` (#140)
+- Fixed support for tenants whose primary key isn't named `id`, or that are
+  referenced through a `to_field`; `TenantFileSystemStorage` silently stored
+  their files in the shared `MEDIA_ROOT` (#140)
 - `shell_tenant` now raises a clear error when neither `--tenant_id` nor
   `--disable` is given, or when the tenant doesn't exist (#140)
 - Fixed `shell_tenant` failing on every run with "Unknown option(s) for shell
@@ -83,31 +83,28 @@
 
 ## [0.5.1] - (2021-12-16)
 - Fixed tox tests
-- Fixed RemovedInDjango41Warning default_app_config (#19)
+- Fixed `RemovedInDjango41Warning` for `default_app_config` (#19)
 
 ## [0.5.0] - (2021-04-21)
-- Removed `set_current_tenant`
-- Added `tenant_context_disabled` to access objects from all tenants
+- Removed `set_current_tenant()`
+- Added `tenant_context_disabled()` to access objects from all tenants
 
 ## [0.4.0] - (2021-03-16)
-- Remove middleware dependency in project (#16)
+- Removed the middleware dependency from the project (#16)
 
 ## [0.3.3] - (2020-07-28)
-- Fix storage
+- Fixed storage
 
 ## [0.3.2] - (2020-07-07)
-
-- Include tenant_required=False in LogoutView
-- Simplified TenantManager
-- Fix database tests
+- Added `tenant_required = False` to `LogoutView`
+- Simplified `TenantManager`
+- Fixed database tests
 
 ## [0.3.1] - (2020-07-01)
-
-- Removes middleware redirect to login responsibility
+- Removed the redirect to login from the middleware
 
 ## [0.3.0] - (2020-07-01)
-
-- Changed how to ignore the use of tenants in views (using decorators and mixin)
-- Fix some methods to filter and assign a tenant to an object
+- Changed how views opt out of tenants (using decorators and a mixin)
+- Fixed methods that filter and assign the tenant of an object
 - Updated example project
-- Added CI tests for others databases
+- Added CI tests for other databases

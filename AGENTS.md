@@ -52,14 +52,16 @@ The project uses `uv` and `tox` (with `tox-uv`). The `Makefile` only has `make i
   cd example && python manage.py migrate && python manage.py runserver
   ```
 
+The example project needs the package installed (`pip install -e .`) and `example/requirements.txt` (django-debug-toolbar). Its modules are all imported through the `example` package; `manage.py` puts the repository root on `sys.path`.
+
 Pytest configuration lives in `[tool.pytest.ini_options]` in `pyproject.toml`: the settings module is `tests.settings`, `--strict-config` and `--strict-markers` are required, and `xfail_strict = true`. Tox also promotes `ResourceWarning`, `DeprecationWarning` and `PendingDeprecationWarning` to errors — new code must not emit them.
 
 ## Architecture
 
-The library is intentionally tiny. Its behavior is concentrated in three pieces that work together:
+The library is intentionally tiny. Its core behavior is concentrated in three pieces that work together, plus the request integration (middleware), storage, management command and system checks described below:
 
 ### 1. Tenant context — `src/easy_tenants/utils.py`
-The "current tenant" is stored in a `contextvars.ContextVar` (`state`) shaped as `{"enabled": bool, "tenant": <Tenant>}`. Two context managers expose it:
+The "current tenant" is stored in a `contextvars.ContextVar` (`state`) shaped as `{"enabled": bool, "tenant": <Tenant>}`. Two context managers expose it (both also work as decorators, on sync and `async def` functions — the async case is wrapped explicitly because `ContextDecorator`'s wrapper is sync):
 - `tenant_context(tenant)` — sets the active tenant inside the block (snapshots and restores the previous state on exit, so it nests correctly).
 - `tenant_context_disabled()` — disables the tenant filter inside the block (used for cross-tenant operations, such as `shell_tenant --disable`).
 
@@ -78,9 +80,16 @@ Two settings control everything:
 - `EASY_TENANTS_TENANT_FIELD` — name of the FK on isolated models, default `"tenant"`. **Read only once at import time** in `models.py` (`tenant_field_name = getattr(settings, ...)`). The test suite uses `"store"` precisely to ensure this name isn't hardcoded anywhere.
 
 ### Storage and management
-- `storage.py` — `TenantFileSystemStorage` partitions `MEDIA_ROOT`/`MEDIA_URL` by `<tenant.id>`. Its properties (`base_location`, `location`, `base_url`) are intentionally **not cached** (the parent `FileSystemStorage` uses `cached_property`); recomputing on every access is what lets the same storage instance produce different paths for different tenants.
+- `storage.py` — `TenantFileSystemStorage` partitions `MEDIA_ROOT`/`MEDIA_URL` by `<tenant.pk>`. Its properties (`base_location`, `location`, `base_url`) are intentionally **not cached** (the parent `FileSystemStorage` uses `cached_property`); recomputing on every access is what lets the same storage instance produce different paths for different tenants.
 - `management/commands/shell_tenant.py` — wraps `shell_plus` (django-extensions) if available, otherwise the standard `shell`, inside `tenant_context(tenant)` or `tenant_context_disabled()`.
-- `apps.py` — `ready()` marks the built-in `django.contrib.auth` views (`LoginView`, `LogoutView`, password reset flow) with `tenant_required = False`. This is a contract for integrators: any middleware that enforces a tenant must honor this attribute when deciding whether a tenant is required.
+- `apps.py` — `ready()` imports `checks.py` (registering the system checks) and marks the built-in `django.contrib.auth` views (`LoginView`, `LogoutView`, password reset flow) with `tenant_required = False`.
+
+### Request integration
+- `middleware.py` — `TenantMiddleware` (sync and async capable) resolves `request.tenant` via `get_tenant()` → `get_tenant_id()` (abstract) and wraps the rest of the request in `get_context()` (`tenant_context(tenant)`, or a no-op when there is no tenant). In `process_view()` it calls `tenant_not_found()` (default: `PermissionDenied`) when there is no tenant and the view requires one. Subclasses: `SessionTenantMiddleware` (session key `tenant_id`) and `HeaderTenantMiddleware` (`X-Tenant-ID` header). `get_tenant()` doesn't check whether the user may access the tenant; that's left to integrators.
+- `decorators.py` — `tenant_not_required` sets `tenant_required = False` on a view. The middleware reads this attribute from the view function or its `view_class`; every view requires a tenant by default.
+
+### System checks — `src/easy_tenants/checks.py`
+`easy_tenants.E001`–`E007` validate `EASY_TENANTS_TENANT_MODEL`, the tenant field of every tenant-aware model (one that inherits `TenantAwareAbstract` or uses `TenantManager`) and that `SessionMiddleware` comes before `SessionTenantMiddleware`. The README documents each ID; keep the table there in sync when adding checks.
 
 ## When making changes
 

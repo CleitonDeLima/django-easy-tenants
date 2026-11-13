@@ -1,66 +1,67 @@
-# easy-tenants
+# django-easy-tenants
 
-![Tests](https://github.com/CleitonDeLima/django-easy-tenants/workflows/Tests/badge.svg)
-[![codecov](https://codecov.io/gh/CleitonDeLima/django-easy-tenants/branch/master/graph/badge.svg)](https://codecov.io/gh/CleitonDeLima/django-easy-tenants)
+[![Tests](https://github.com/CleitonDeLima/django-easy-tenants/actions/workflows/tests-ci.yml/badge.svg)](https://github.com/CleitonDeLima/django-easy-tenants/actions/workflows/tests-ci.yml)
+[![codecov](https://codecov.io/gh/CleitonDeLima/django-easy-tenants/branch/main/graph/badge.svg)](https://codecov.io/gh/CleitonDeLima/django-easy-tenants)
 [![PyPI Version](https://img.shields.io/pypi/v/django-easy-tenants.svg)](https://pypi.org/project/django-easy-tenants/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/django-easy-tenants.svg)](https://img.shields.io/pypi/dm/django-easy-tenants.svg)
+[![PyPI downloads](https://img.shields.io/pypi/dm/django-easy-tenants.svg)](https://pypistats.org/packages/django-easy-tenants)
 
 
-This is a Django app for managing multiple tenants on the same project
-instance using a shared approach.
+A Django app for managing multiple tenants in the same project instance
+using the shared approach.
 
 
 ## Background
 
-There are typically three solutions for solving the multitenancy problem:
+There are typically three approaches to multitenancy:
 
-1. Isolated Approach: Separate Databases. Each tenant has it’s own database.
-2. Semi Isolated Approach: Shared Database, Separate Schemas.
-One database for all tenants, but one schema per tenant.
-3. Shared Approach: Shared Database, Shared Schema. All tenants share
-the same database and schema. There is a main tenant-table, where all
-other tables have a foreign key pointing to.
+1. Isolated approach: separate databases. Each tenant has its own database.
+2. Semi-isolated approach: shared database, separate schemas. One database
+for all tenants, but one schema per tenant.
+3. Shared approach: shared database, shared schema. All tenants share the
+same database and schema. A main tenant table is referenced by a foreign key
+from every other table.
 
-This application implements the third approach,  which in our opinion,
-is the best solution for a large amount of tenants.
+This app implements the third approach which, in our opinion, is the best
+solution for a large number of tenants.
 
-For more information: [Building Multi Tenant Applications with Django
-](https://books.agiliq.com/projects/django-multi-tenant/en/latest/)
+For more information, see [Building Multi Tenant Applications with
+Django](https://books.agiliq.com/projects/django-multi-tenant/en/latest/).
 
-Below is a demonstration of the features in each approach for an application
-with 5000 tenants.
+The table below compares the approaches for an application with 5000
+tenants. "Public access" means data that is shared by all tenants (e.g. a
+plans table) can be stored once and queried directly.
 
-Approach       | Number of DB | Number of Schemas | Django migration time | Public access
--------------- | ------------ | ----------------- | --------------------- | ---------------
-Isolated       | 5000         | 5000              | slow (1/DB)           | No
-Semi Isolated  | 1            | 5000              | slow (1/Schema)       | Yes
-Shared         | 1            | 1                 | fast (1)              | Yes
+Approach       | Databases | Schemas | Django migration time | Public access
+-------------- | --------- | ------- | --------------------- | -------------
+Isolated       | 5000      | 5000    | slow (1/DB)           | No
+Semi-isolated  | 1         | 5000    | slow (1/schema)       | Yes
+Shared         | 1         | 1       | fast (1)              | Yes
 
 
 ## Installation
-Assuming you have django installed, the first step is to install `django-easy-tenants`.
+Assuming you have Django installed, install `django-easy-tenants`:
+
 ```bash
 python -m pip install django-easy-tenants
 ```
-Now you can import the tenancy module in your Django project.
 
 
 ## Setup
-It is recommended to install this app at the beginning of a project.
-In an existing project, depending on the structure of the models,
-the data migration can be hard.
+It is recommended to adopt this app at the beginning of a project. In an
+existing project, depending on the structure of the models, migrating the
+data can be hard.
 
-Add `easy_tenants` to your `INSTALLED_APPS` on `settings.py`.
+Add `easy_tenants` to `INSTALLED_APPS` in `settings.py`.
 
 `settings.py`
 ```python
 INSTALLED_APPS = [
     ...,
-    'easy_tenants',
+    "easy_tenants",
 ]
 ```
 
-Create a model which will be the tenant of the application.
+Create the model that will be the tenant of the application.
 
 `yourapp/models.py`
 ```python
@@ -75,25 +76,20 @@ class Customer(models.Model):
 EASY_TENANTS_TENANT_MODEL = "yourapp.Customer"
 ```
 
-Your models, which must have isolated data per tenant, we need to add the foreign field from the Customer model.
-and objects need to be replaced with `TenantManager()`.
+Models whose data must be isolated per tenant need a `ForeignKey` to the
+tenant model, must inherit from `TenantAwareAbstract` and must use
+`TenantManager` as their manager:
 
+- `TenantManager` filters every query by the active tenant.
+- `TenantAwareAbstract` sets the active tenant on the object when it's
+  created, so you never assign the foreign key yourself. Without it, you
+  must set the tenant before saving.
 
+`yourapp/models.py`
 ```python
 from django.db import models
-from easy_tenants.models import TenantManager
+from easy_tenants.models import TenantAwareAbstract, TenantManager
 
-class Product(models.Model):
-    tenant = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
-    name = models.CharField(max_length=10)
-
-    objects = TenantManager()
-```
-
-If you prefer you can use `TenantAwareAbstract` to implement the save method for you,
-so when saving an object the tenant will be automatically defined.
-
-```python
 class Product(TenantAwareAbstract):
     tenant = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
     name = models.CharField(max_length=10)
@@ -101,8 +97,9 @@ class Product(TenantAwareAbstract):
     objects = TenantManager()
 ```
 
-
-If your foreign field has a name other than `tenant` you can change it with a settings. (default is `"tenant"`)
+If the foreign key has a name other than `tenant` (the default), set it with
+the `EASY_TENANTS_TENANT_FIELD` setting. This setting is global: every
+tenant-aware model must use the same field name.
 
 ```python
 # models.py
@@ -116,14 +113,50 @@ class Product(TenantAwareAbstract):
 EASY_TENANTS_TENANT_FIELD = "customer"
 ```
 
-To obtain the data for each tenant, it is necessary to define which tenant will be used:
+
+## Tenant context
+To query the data of a tenant, activate it with `tenant_context`:
 
 ```python
 from easy_tenants import tenant_context
 
 with tenant_context(customer):
-    Product.objects.all()  # filter by customer
+    Product.objects.all()  # only the products of this customer
+    Product.objects.create(name="Shirt")  # saved with tenant=customer
 ```
+
+Querying a tenant-aware model without an active tenant raises
+`easy_tenants.exceptions.TenantError`. To access the data of all tenants,
+disable the filter with `tenant_context_disabled`:
+
+```python
+from easy_tenants import tenant_context_disabled
+
+with tenant_context_disabled():
+    Product.objects.all()  # the products of every tenant
+```
+
+Both can also be used as decorators, on regular or `async def` functions:
+
+```python
+@tenant_context(customer)
+def import_products():
+    ...
+
+@tenant_context_disabled()
+async def count_all_products():
+    return await Product.objects.acount()
+```
+
+`get_current_tenant()` returns the active tenant (or `None` when the filter
+is disabled):
+
+```python
+from easy_tenants import get_current_tenant
+
+tenant = get_current_tenant()
+```
+
 
 ## Middleware
 A middleware activates the tenant of each request, so views don't need
@@ -151,6 +184,7 @@ password reset views are already marked):
 
 ```python
 from django.utils.decorators import method_decorator
+from django.views import View
 from easy_tenants.decorators import tenant_not_required
 
 @tenant_not_required
@@ -195,30 +229,52 @@ Note that with token authentication in Django REST framework the user is
 authenticated in the view, after the middleware runs, so `request.user` is
 still anonymous inside `get_tenant()`.
 
+
 ## File storage
-If you want to separate the upload files by tenant, you need to change the `DEFAULT_FILE_STORAGE`
-configuration (only available for local files).
+To store uploaded files in a separate directory per tenant
+(`MEDIA_ROOT/<tenant pk>/`), set `TenantFileSystemStorage` as the default
+storage (local files only):
 
 ```python
-DEFAULT_FILE_STORAGE = 'easy_tenants.storage.TenantFileSystemStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "easy_tenants.storage.TenantFileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 ```
 
+Inside `tenant_context_disabled()` files are stored in `MEDIA_ROOT` itself.
+
+
 ## UniqueTenantConstraint
-`UniqueTenantConstraint` is a custom Django constraint that ensures uniqueness of fields within the context of the current tenant. This is especially useful for multi-tenant applications, where you want to allow the same values to exist across different tenants, but enforce uniqueness within each tenant.
+`UniqueTenantConstraint` is a Django constraint that enforces uniqueness
+within each tenant. It allows the same values to exist across different
+tenants, but not twice in the same tenant.
 
 ### How it works
-This constraint automatically adds the tenant field to the list of fields being checked for uniqueness. That means, for example, two tenants can have products with the same name and SKU, but a single tenant cannot have duplicate products with the same name and SKU.
+The constraint automatically adds the tenant field to the fields checked for
+uniqueness. For example, two tenants can have products with the same name
+and SKU, but a single tenant cannot have two products with the same name and
+SKU.
 
-### Usage Example
-Suppose you have a `Product` model and a `Tenant` model. You want to make sure that each product's `name` and `sku` combination is unique per tenant.
+### Usage example
+To make each product's `name` and `sku` combination unique per tenant:
 
 ```python
 from django.db import models
 
-from easy_tenants.models import TenantAwareAbstract, TenantManager, UniqueTenantConstraint
+from easy_tenants.models import (
+    TenantAwareAbstract,
+    TenantManager,
+    UniqueTenantConstraint,
+)
 
 
 class Product(TenantAwareAbstract):
+    tenant = models.ForeignKey(Customer, on_delete=models.CASCADE, editable=False)
     name = models.CharField(max_length=100)
     sku = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -229,22 +285,38 @@ class Product(TenantAwareAbstract):
         constraints = [
             UniqueTenantConstraint(
                 fields=["name", "sku"],
-                name="unique_product_name_sku_per_tenant"
+                name="unique_product_name_sku_per_tenant",
             )
         ]
 ```
 
-With this constraint, the following is possible:
+With this constraint:
 - Tenant A can have a product with name "Shirt" and SKU "123".
 - Tenant B can also have a product with name "Shirt" and SKU "123".
-- But Tenant A cannot have two products with the same name "Shirt" and SKU "123".
+- Tenant A cannot have a second product with name "Shirt" and SKU "123".
 
 ### Notes
-- The tenant field is automatically added to the uniqueness check, so you don't need to include it in the `fields` list.
-- If the uniqueness constraint is violated within a tenant, a `ValidationError` will be raised.
+- The tenant field is added automatically, so don't include it in `fields`.
+- Expressions are also supported, e.g.
+  `UniqueTenantConstraint(Lower("name"), name="...")`.
+- Model validation (`full_clean()`, model forms) raises a `ValidationError`
+  when the constraint is violated. Calling `save()` directly without
+  validating raises the database's `IntegrityError`.
+
+
+## Management command
+`shell_tenant` opens a Django shell (or `shell_plus`, if
+[django-extensions](https://github.com/django-extensions/django-extensions)
+is installed) with a tenant already active:
+
+```bash
+python manage.py shell_tenant --tenant_id=1  # activate the tenant with pk 1
+python manage.py shell_tenant --disable      # access the data of all tenants
+```
+
 
 ## System checks
-easy-tenants registers [system checks](https://docs.djangoproject.com/en/stable/topics/checks/)
+django-easy-tenants registers [system checks](https://docs.djangoproject.com/en/stable/topics/checks/)
 that run with `manage.py check` (and on `runserver`/`migrate`) to catch
 misconfiguration early. A model is *tenant-aware* when it inherits
 `TenantAwareAbstract` or uses `TenantManager`.
@@ -263,17 +335,25 @@ Models with a foreign key to the tenant that don't use `TenantManager` (e.g. a
 `Membership` linking users to tenants) are not reported: they are unfiltered
 on purpose.
 
+
 ## Running the example project
+From the repository root, with the package installed:
+
 ```bash
+python -m pip install -e . -r example/requirements.txt
+cd example
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
-Access the page `/admin/`, create a `Customer`.
 
-## Motivation
-[django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+Open `/admin/`, log in and create a `Customer`. Then open `/`, choose the
+customer and create categories and products for it.
 
-[django-tenants](https://github.com/tomturner/django-tenants)
 
-[django-scopes](https://github.com/raphaelm/django-scopes)
+## Related projects
+Other multitenancy libraries for Django that inspired this project:
+
+- [django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas)
+- [django-tenants](https://github.com/tomturner/django-tenants)
+- [django-scopes](https://github.com/raphaelm/django-scopes)

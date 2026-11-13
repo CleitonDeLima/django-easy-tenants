@@ -54,7 +54,7 @@ MIDDLEWARE = [
     "example.middleware.TenantMiddleware",
 ]
 
-ROOT_URLCONF = "urls"
+ROOT_URLCONF = "example.urls"
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "wsgi.application"
+WSGI_APPLICATION = "example.wsgi.application"
 
 
 # Database
