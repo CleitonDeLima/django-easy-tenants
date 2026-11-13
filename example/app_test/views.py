@@ -3,15 +3,8 @@ from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from easy_tenants.decorators import tenant_not_required
 from example.app_test.models import Category, Customer, Product
-
-
-def tenant_not_required(view_func):
-    """
-    Decorator for views that marks that the view is accessible without tenants.
-    """
-    view_func.tenant_required = False
-    return view_func
 
 
 @login_required

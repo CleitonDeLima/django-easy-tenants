@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+- Added `SessionTenantMiddleware` and `HeaderTenantMiddleware`, plus the
+  `tenant_not_required` decorator to mark views that don't require a
+  tenant (#XXX)
 
 ## [0.10.0] - (2026-10-20)
 - Added support for Django 6.0, 6.1 and Python 3.13, 3.14, 3.15 (#138)
