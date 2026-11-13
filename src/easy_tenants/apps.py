@@ -8,6 +8,8 @@ class EasyTenantsConfig(AppConfig):
     def ready(self):
         from django.contrib.auth import views
 
+        from easy_tenants import checks  # noqa: F401 (registers the checks)
+
         login_not_required_views = (
             views.LoginView,
             views.LogoutView,
