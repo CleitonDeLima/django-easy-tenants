@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.11.0] - (2026-11-16)
 - Added `SessionTenantMiddleware` and `HeaderTenantMiddleware`, plus the
   `tenant_not_required` decorator to mark views that don't require a
   tenant (#149)
