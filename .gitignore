@@ -45,3 +45,6 @@ db.sqlite3-journal
 .DS_Store
 .idea/
 .vscode/
+
+# Sphinx documentation
+docs/_build/

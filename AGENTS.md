@@ -6,7 +6,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 `django-easy-tenants` is a lean Django library (a single app: `easy_tenants`) that implements multitenancy using the *shared database, shared schema* pattern: every tenant-isolated model carries a `ForeignKey` to a Tenant model defined by the project, and the library filters queries by the tenant active in the current context.
 
-The package is published on PyPI; the code lives in `src/easy_tenants/`. The repository also contains an example Django project in `example/` (manual demo) and a Django project in `tests/` used by pytest.
+The package is published on PyPI; the code lives in `src/easy_tenants/`. The documentation lives in `docs/` (Sphinx with the Furo theme, pages written in MyST Markdown) and is built by Read the Docs from `.readthedocs.yaml`; user-facing changes must update the matching page in `docs/`. The README is only a short quickstart that links to the documentation. The repository also contains an example Django project in `example/` (manual demo) and a Django project in `tests/` used by pytest.
 
 ## Project conventions
 
@@ -51,6 +51,14 @@ The project uses `uv` and `tox` (with `tox-uv`). The `Makefile` only has `make i
   ```bash
   cd example && python manage.py migrate && python manage.py runserver
   ```
+- **Build the documentation** (Sphinx + Furo + MyST, same flags as Read the Docs — warnings are errors):
+  ```bash
+  uv run --group docs sphinx-build -W -b html docs docs/_build/html
+  ```
+- **Preview the documentation with live reload** (serves on `http://127.0.0.1:8000`, rebuilds on changes to `docs/` and to docstrings in `src/`):
+  ```bash
+  uv run --group docs sphinx-autobuild docs docs/_build/html --watch src
+  ```
 
 The example project needs the package installed (`pip install -e .`) and `example/requirements.txt` (django-debug-toolbar). Its modules are all imported through the `example` package; `manage.py` puts the repository root on `sys.path`.
 
@@ -89,7 +97,7 @@ Two settings control everything:
 - `decorators.py` — `tenant_not_required` sets `tenant_required = False` on a view. The middleware reads this attribute from the view function or its `view_class`; every view requires a tenant by default.
 
 ### System checks — `src/easy_tenants/checks.py`
-`easy_tenants.E001`–`E007` validate `EASY_TENANTS_TENANT_MODEL`, the tenant field of every tenant-aware model (one that inherits `TenantAwareAbstract` or uses `TenantManager`) and that `SessionMiddleware` comes before `SessionTenantMiddleware`. The README documents each ID; keep the table there in sync when adding checks.
+`easy_tenants.E001`–`E007` validate `EASY_TENANTS_TENANT_MODEL`, the tenant field of every tenant-aware model (one that inherits `TenantAwareAbstract` or uses `TenantManager`) and that `SessionMiddleware` comes before `SessionTenantMiddleware`. `docs/checks.md` documents each ID; keep the table there in sync when adding checks.
 
 ## When making changes
 
