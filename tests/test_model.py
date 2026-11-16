@@ -10,7 +10,7 @@ from easy_tenants import (
     tenant_context_disabled,
 )
 from easy_tenants.exceptions import TenantError
-from easy_tenants.models import UniqueTenantConstraint
+from easy_tenants.models import CurrentTenant, UniqueTenantConstraint
 from tests.models import (
     Bin,
     Category,
@@ -43,6 +43,17 @@ def test_get_objects_of_tenant(db):
         Product.objects.create(name="prod2")
 
         assert Product.objects.count() == 1
+
+
+def test_current_tenant_expressions_compare_by_identity():
+    field = StoreTenant._meta.pk
+
+    assert CurrentTenant(output_field=field) == CurrentTenant(
+        output_field=field
+    )
+    assert hash(CurrentTenant(output_field=field)) == hash(
+        CurrentTenant(output_field=field)
+    )
 
 
 def test_custom_queryset_in_manager(tenant_ctx):

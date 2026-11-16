@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
-from django.db.models.expressions import BaseExpression, F
+from django.db.models.expressions import Expression, F
 
 from easy_tenants import get_current_tenant
 from easy_tenants.utils import get_state
@@ -10,7 +10,7 @@ from easy_tenants.utils import get_state
 tenant_field_name = getattr(settings, "EASY_TENANTS_TENANT_FIELD", "tenant")
 
 
-class CurrentTenant(BaseExpression):
+class CurrentTenant(Expression):
     """Expression used to get tenant only when sql is actually executed"""
 
     def as_sql(self, compiler, connection, *args, **kwargs):
